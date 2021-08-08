@@ -1,0 +1,189 @@
+I"1<p><strong><center>Ref°: HTB-11-Machine</center></strong></p>
+
+<p>— Sauna is a Windows machine that highlights the enumeration of users through the web and ldap service and the practice of the AS-REP Roasting attack (Kerberos service) with work around usernames format to find our first credential.
+This allows us to have access on the machine with evil-winrm tool and gain a foothold.</p>
+
+<p>Lateral movement on svc_loanmgr is possible through the configuration like Autologon. This brings to light her password in clear in regedit.</p>
+
+<p>Privilege escalation is possible from svc_loanmgr. We can perform DCSync attack and find the hash of the administrator. Pass the Hash Attack help us to be authenticated without administrator password.</p>
+
+<p><img src="/assets/images/sauna/HTB-Information-Sauna.png" alt="Desktop View" /></p>
+
+<h2 id="1discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>We find interesting services ; <code class="language-plaintext highlighter-rouge">dns</code>, <code class="language-plaintext highlighter-rouge">kerberos</code>, <code class="language-plaintext highlighter-rouge">ldap</code> and <code class="language-plaintext highlighter-rouge">smb</code> on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.175 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="website-iis">Website IIS</h3>
+<hr />
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-web.png" alt="Desktop View" /></p>
+
+<p>Many username present under about page : <code class="language-plaintext highlighter-rouge">Fegus Smith, Shaun Coins, Hugo Bear, Bowie Taylor, Sophie Driver, Steven Kerb</code></p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-webenum.png" alt="Desktop View" /></p>
+
+<h3 id="enumerate-ldap-service-from-ldap-search-script">Enumerate LDAP service from ldap-search script</h3>
+<hr />
+
+<p>Ldap service give us essential informations with nmap script <code class="language-plaintext highlighter-rouge">ldap-search</code> on port 389.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">--script</span> ldap-search 10.10.10.175 <span class="nt">-p</span> 389
+</code></pre></div></div>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-ldapenum.png" alt="Desktop View" /></p>
+
+<h3 id="exploit-active-directory-machine">Exploit Active Directory Machine</h3>
+<hr />
+
+<p>We have much possitiblity to exploit Active-Directory Machine.</p>
+
+<p>Reference - Active-Directory exploit toolbox : <a href="https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md">https://github.com/infosecn1nja/AD-Attack-Defense/blob/master/README.md</a></p>
+
+<p>Here our target is kerberos service. This service is a computer-network authentication protocol that works on the basis of tickets to allow nodes communicating over a non-secure network to prove their identity to one another in a secure manner. We have several possible attacks : AS-Rep Roasting / Kerberoasting / Pass the key / Pass the ticket / Silver ticket / Golden ticket</p>
+
+<p>We use AS-Rep Roasting attack to gain a foothold. This technique is simple, that allows to retrieve hash (NTLM) from users of a domain that do not require kerberos pre-authentication. The hash can then be cracked via JohnTheRipper for example. By default pre-authentication is enabled but can be disabled in the user properties via the Active Directory.</p>
+
+<p>Reference - AS-Rep Roasting attack : <a href="https://beta.hackndo.com/kerberos-asrep-roasting/">https://beta.hackndo.com/kerberos-asrep-roasting/</a></p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="as-rep-roasting-attack">As-Rep Roasting Attack</h3>
+<hr />
+
+<p>We create the userfile with all combinations of username format we which can be found in the Active-Directory.</p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-userfile.png" alt="Desktop View" /></p>
+
+<p>Get hash password of all users who do not require Kerberos preauthentication with GetNPUsers.py</p>
+
+<p>Reference - GetNPUsers.py : <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers.py">https://github.com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python3 GetNPUsers.py egotistical-bank.local/ <span class="nt">-usersfile</span> /home/pcw3r/Documents/writeups/htb/sauna/userfile-asrep.txt <span class="nt">-format</span> hashcat <span class="nt">-outputfile</span> /home/pcw3r/Documents/writeups/htb/sauna/hashuser.txt <span class="nt">-dc-ip</span> 10.10.10.175
+</code></pre></div></div>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-asrepresult.png" alt="Desktop View" /></p>
+
+<p>We result hash NTLM for the user <code class="language-plaintext highlighter-rouge">fmsith</code>.</p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-asrepresult2.png" alt="Desktop View" /></p>
+
+<h3 id="cracking-password">Cracking password</h3>
+<hr />
+
+<p>We crack the password of the user fmsith : <code class="language-plaintext highlighter-rouge">TheStrokes23</code></p>
+
+<p>Reference - johntheripper tool : <a href="https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c">https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>/usr/sbin/john <span class="nt">--wordlist</span><span class="o">=</span>/root/Documents/wordlist/rockyou.txt /home/pcw3r/Documents/writeups/htb/sauna/hashuser.txt
+</code></pre></div></div>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-passwdcracking.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-winrm-login">Remote Service WinRM login</h3>
+<hr />
+
+<p>We can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985).</p>
+
+<p>WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators.</p>
+
+<p>Reference - evil-winrm tool : <a href="https://github.com/Hackplayers/evil-winrm">https://github.com/Hackplayers/evil-winrm</a></p>
+
+<h3 id="flag-user">Flag user</h3>
+<hr />
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-userflag.png" alt="Desktop View" /></p>
+
+<p>The exploitation is successful and we have gained a foothold.</p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="plaintext-password-in-autologon">Plaintext Password in Autologon</h3>
+<hr />
+
+<p>We use winPEAS tool to search possible local privilege escalation paths.</p>
+
+<p>First we need to import this tool through attribute -e in evil-winrm.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ruby evil-winrm.rb <span class="nt">-i</span> 10.10.10.175 <span class="nt">-u</span> fsmith <span class="nt">-p</span> <span class="s1">'TheStrokes23'</span> <span class="nt">-e</span> <span class="s2">"/home/pcw3r/Documents/tools/.../"</span>
+<span class="gp">PS c:\Users\FSmith\Documents&gt;</span><span class="w"> </span>menu
+<span class="gp">PS c:\Users\FSmith\Documents&gt;</span><span class="w"> </span>Invoke-Binary <span class="s2">"/home/pcw3r/Documents/tools/.../winPEASany.exe"</span> cmd fast
+</code></pre></div></div>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-putwinpeas.png" alt="Desktop View" /></p>
+
+<p>winPEAS result AutoLogon credential for svc_loanmgr account : <code class="language-plaintext highlighter-rouge">Moneymakestheworldgoround!</code></p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-resultwinpeas.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-winrm-login-1">Remote Service WinRM login</h3>
+<hr />
+
+<p>We connect with evil-winrm.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ruby evil-winrm.rb <span class="nt">-i</span> 10.10.10.175 <span class="nt">-u</span> svc_loanmgr <span class="nt">-p</span> <span class="s1">'Moneymakestheworldgoround!'</span>
+<span class="gp">PS c:\Users\FSmith\Documents&gt;</span><span class="w"> </span>Invoke-Binary <span class="s2">"/home/pcw3r/Documents/tools/.../winPEASany.exe"</span> cmd fast
+</code></pre></div></div>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="dcsync-attack">DCSync Attack</h3>
+<hr />
+
+<p>We have accounts that can log on to the DC, so it’s possible to dump hashes from NTDS.dit remotely via RPC protocol with <code class="language-plaintext highlighter-rouge">secretdump</code> through impacket toolbox.</p>
+
+<p>We can also said “we perform a DCSync Attack”.</p>
+
+<p>DCSync is an attack that allows an attacker to simulate the behavior of Domain Controller (DC) in order to retrieve password hash of the entire domain via domain replication.</p>
+
+<p>References - DCSync Attack :</p>
+<ul>
+  <li><a href="https://medium.com/@airman604/dumping-active-directory-password-hashes-deb9468d1633">https://medium.com/@airman604/dumping-active-directory-password-hashes-deb9468d1633</a></li>
+  <li><a href="https://attack.stealthbits.com/privilege-escalation-using-mimikatz-dcsync">https://attack.stealthbits.com/privilege-escalation-using-mimikatz-dcsync</a></li>
+</ul>
+
+<p>Reference - secretdump.py : <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/secretsdump.py">https://github.com/SecureAuthCorp/impacket/blob/master/examples/secretsdump.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python3 secretsdump.py <span class="nt">-just-dc-ntlm</span> EGOTISTICAL-BANK.LOCAL/svc_loanmgr@10.10.10.175
+</code></pre></div></div>
+
+<p>We retrieve the html hash of administrator to success a connection with wmiexec.</p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-dumphash.png" alt="Desktop View" /></p>
+
+<p>We could have realized with fmsith account, but the password has expired.</p>
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-faileddump.png" alt="Desktop View" /></p>
+
+<h3 id="pass-the-hash">Pass The Hash</h3>
+<hr />
+
+<p>Always from our impacket toolbox, we use nthash (a part of the administrator hash password lmhash:nthash) and wmiexec script without knowledge of the Administrator password to gain access.</p>
+
+<p>Reference - Pass the Hash : <a href="https://blog.ropnop.com/practical-usage-of-ntlm-hashes/">https://blog.ropnop.com/practical-usage-of-ntlm-hashes/</a></p>
+
+<p>Reference - wmiexec.py : <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/wmiexec.py">https://github.com/SecureAuthCorp/impacket/blob/master/examples/wmiexec.py</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python3 wmiexec.py <span class="nt">-hashes</span> :d9485863c1e9e05851aa40cbb4ab9dff administrator@10.10.10.175
+</code></pre></div></div>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p><img src="/assets/images/sauna/HTB-Images-Sauna-passthehash.png" alt="Desktop View" /></p>
+
+<p>Sauna machine is compromise.</p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Technology is just a tool. In terms of getting the kids working together and motivating them, the teacher is the most important.</strong></p>
+
+  <p>Bill Gates</p>
+</blockquote>
+:ET

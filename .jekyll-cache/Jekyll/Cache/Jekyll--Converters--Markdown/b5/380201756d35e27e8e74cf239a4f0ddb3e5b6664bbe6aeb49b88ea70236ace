@@ -1,0 +1,7 @@
+I"<p>Breadcrumbs is a vulnerable machine through :</p>
+<ul>
+  <li>Foothold &gt; Cookie Hijacking from LFI in php files</li>
+  <li>Lateral movement &gt; Reusing credentials plaintext</li>
+  <li>Privilege Escalation &gt; SQL Injection in Password Manager `</li>
+</ul>
+:ET

