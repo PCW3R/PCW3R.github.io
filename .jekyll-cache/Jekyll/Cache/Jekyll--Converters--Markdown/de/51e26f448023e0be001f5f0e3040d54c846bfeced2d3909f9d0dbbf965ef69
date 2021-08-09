@@ -1,12 +1,4 @@
----
-title: "Infosec Website by "
-layout: default
-pagination:
-    enabled: true
-description: ""
----
-
-<div class="container">
+I"]<div class="container">
         <div class="row mb-6">
             <div class="col-md-12">
             <p><b>Disclaimer:</b> All posts provided on this blog is for informational and educational purpose only. It's your responsibility if you decide to use informations of this blog to make illegal actions.</p>
@@ -22,7 +14,7 @@ description: ""
     <div class="col-md-6">
     <div class="card border-0 mb-4 box-shadow">   
     <a href="{{site.baseurl}}{{latest_post.url}}">
-    <div class="topfirstimage" style="background-image: url({% if latest_post.image contains "://" %}{{ latest_post.image }}{% else %} {{site.baseurl}}/{{ latest_post.image}}{% endif %}); height: 200px;    background-size: cover;    background-repeat: no-repeat;"></div>     
+    &lt;div class="topfirstimage" style="background-image: url({% if latest_post.image contains "://" %}{{ latest_post.image }}{% else %} {{site.baseurl}}/{{ latest_post.image}}{% endif %}); height: 200px;    background-size: cover;    background-repeat: no-repeat;"&gt;&lt;/div&gt;     
     </a>
     <div class="card-body px-0 pb-0 d-flex flex-column align-items-start">
     <h2 class="h4 font-weight-bold">
@@ -56,7 +48,7 @@ description: ""
        <span class="taglist">
                <h4 class="font-weight-bold spanborder">Trending Tags</h4>
 				{% for tag in site.tags %}
-				 <a class="sscroll btn btn-light btn-sm font-weight-bold" href="{{site.baseurl}}/tags.html#{{ tag[0] | replace: ' ', '-' }}">{{ tag[1] | size }} - {{ tag[0] | replace: ' ', '-' }}</a>
+				 <a class="sscroll btn btn-light btn-sm font-weight-bold" href="{{site.baseurl}}/tags.html#{{ tag[1] | size }} - {{ tag[0] | replace: ' ', '-' }}">{{ tag[1] | size }} - {{ tag[0] | replace: ' ', '-' }}</a>
 				{% endfor %}
 	    </span>       
     </div>
@@ -109,7 +101,7 @@ description: ""
         
         <div class="mt-5">
          <!-- Pagination links -->
-            {% if paginator.total_pages > 1 %}
+            {% if paginator.total_pages &gt; 1 %}
             <ul class="pagination"> 
               {% if paginator.previous_page %}
                 <li class="page-item"><a class="page-link" href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&laquo; Prev</a></li>
@@ -143,3 +135,4 @@ description: ""
 
 
 </div>
+:ET
